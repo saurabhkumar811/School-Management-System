@@ -133,10 +133,9 @@ const ChooseUser = ({ visitor }) => {
 
 export default ChooseUser;
 
-// Styled Components
 const StyledContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,56 +143,60 @@ const StyledContainer = styled.div`
 
 const Title = styled.h1`
   text-align: center;
-  color: #fff;
-  margin-bottom: 2rem;
+  color: #222;
+  margin-bottom: 2.5rem;
+  font-size: 2.7rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  font-size: 2.5rem;
+  letter-spacing: 1.5px;
 `;
 
 const StyledCard = styled(Paper)`
   padding: 2.5rem 1.5rem 2rem 1.5rem;
   border-radius: 1.5rem !important;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: 0 4px 24px 0 rgba(60, 72, 100, 0.10);
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.18s, box-shadow 0.18s;
   min-height: 340px;
+  border: 2px solid #f0f0f0;
+  background: #fafbfc;
   &:hover {
-    transform: translateY(-8px) scale(1.04);
-    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.37);
-    background: #fff !important;
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 32px 0 rgba(60, 72, 100, 0.18);
+    border-color: #b8b8ff;
+    background: #fff;
   }
 `;
 
 const ImageCircle = styled.div`
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 1.2rem auto;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 1.3rem auto;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  background: #f5f6fa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   display: flex;
   align-items: center;
   justify-content: center;
   img {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
   }
 `;
 
 const CardTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #2d3142;
-  margin-bottom: 0.7rem;
+  font-size: 1.45rem;
+  color: #222;
+  margin-bottom: 0.6rem;
   font-weight: 600;
+  letter-spacing: 0.5px;
 `;
 
 const CardDesc = styled.p`
-  color: #333;
-  font-size: 1rem;
-  opacity: 0.85;
+  color: #555;
+  font-size: 1.07rem;
+  opacity: 0.92;
   margin-bottom: 0;
+  line-height: 1.5;
 `;
-
