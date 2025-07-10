@@ -8,123 +8,115 @@ import {
   CircularProgress,
   Backdrop,
 } from '@mui/material';
-import { AccountCircle, School, Group } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/userRelated/userHandle';
 import Popup from '../components/Popup';
 
+// Sample images (replace with your own or use URLs from a CDN)
+const adminImg = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+const studentImg = 'https://cdn-icons-png.flaticon.com/512/3135/3135755.png';
+const teacherImg = 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+
 const ChooseUser = ({ visitor }) => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const password = "zxc"
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const password = "zxc";
 
-  const { status, currentUser, currentRole } = useSelector(state => state.user);;
+  const { status, currentUser, currentRole } = useSelector(state => state.user);
 
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
 
   const navigateHandler = (user) => {
     if (user === "Admin") {
       if (visitor === "guest") {
-        const email = "yogendra@12"
-        const fields = { email, password }
-        setLoader(true)
-        dispatch(loginUser(fields, user))
-      }
-      else {
+        const email = "yogendra@12";
+        const fields = { email, password };
+        setLoader(true);
+        dispatch(loginUser(fields, user));
+      } else {
         navigate('/Adminlogin');
       }
-    }
-
-    else if (user === "Student") {
+    } else if (user === "Student") {
       if (visitor === "guest") {
-        const rollNum = "1"
-        const studentName = "Dipesh Awasthi"
-        const fields = { rollNum, studentName, password }
-        setLoader(true)
-        dispatch(loginUser(fields, user))
-      }
-      else {
+        const rollNum = "1";
+        const studentName = "Dipesh Awasthi";
+        const fields = { rollNum, studentName, password };
+        setLoader(true);
+        dispatch(loginUser(fields, user));
+      } else {
         navigate('/Studentlogin');
       }
-    }
-
-    else if (user === "Teacher") {
+    } else if (user === "Teacher") {
       if (visitor === "guest") {
-        const email = "tony@12"
-        const fields = { email, password }
-        setLoader(true)
-        dispatch(loginUser(fields, user))
-      }
-      else {
+        const email = "tony@12";
+        const fields = { email, password };
+        setLoader(true);
+        dispatch(loginUser(fields, user));
+      } else {
         navigate('/Teacherlogin');
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (status === 'success' || currentUser !== null) {
       if (currentRole === 'Admin') {
         navigate('/Admin/dashboard');
-      }
-      else if (currentRole === 'Student') {
+      } else if (currentRole === 'Student') {
         navigate('/Student/dashboard');
       } else if (currentRole === 'Teacher') {
         navigate('/Teacher/dashboard');
       }
-    }
-    else if (status === 'error') {
-      setLoader(false)
-      setMessage("Network Error")
-      setShowPopup(true)
+    } else if (status === 'error') {
+      setLoader(false);
+      setMessage("Network Error");
+      setShowPopup(true);
     }
   }, [status, currentRole, navigate, currentUser]);
 
+  const userTypes = [
+    {
+      label: "Admin",
+      desc: "Login as an administrator to access the dashboard and manage app data.",
+      img: adminImg,
+      bg: "#f7cac9"
+    },
+    {
+      label: "Student",
+      desc: "Login as a student to explore course materials and assignments.",
+      img: studentImg,
+      bg: "#b5ead7"
+    },
+    {
+      label: "Teacher",
+      desc: "Login as a teacher to create courses, assignments, and track student progress.",
+      img: teacherImg,
+      bg: "#ffdac1"
+    }
+  ];
+
   return (
     <StyledContainer>
-      <Container>
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} sm={6} md={4}>
-            <div onClick={() => navigateHandler("Admin")}>
-              <StyledPaper elevation={3}>
-                <Box mb={2}>
-                  <AccountCircle fontSize="large" />
-                </Box>
-                <StyledTypography>
-                  Admin
-                </StyledTypography>
-                Login as an administrator to access the dashboard to manage app data.
-              </StyledPaper>
-            </div>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <StyledPaper elevation={3}>
-              <div onClick={() => navigateHandler("Student")}>
-                <Box mb={2}>
-                  <School fontSize="large" />
-                </Box>
-                <StyledTypography>
-                  Student
-                </StyledTypography>
-                Login as a student to explore course materials and assignments.
-              </div>
-            </StyledPaper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <StyledPaper elevation={3}>
-              <div onClick={() => navigateHandler("Teacher")}>
-                <Box mb={2}>
-                  <Group fontSize="large" />
-                </Box>
-                <StyledTypography>
-                  Teacher
-                </StyledTypography>
-                Login as a teacher to create courses, assignments, and track student progress.
-              </div>
-            </StyledPaper>
-          </Grid>
+      <Container maxWidth="md">
+        <Title>Choose Your Role</Title>
+        <Grid container spacing={4} justifyContent="center">
+          {userTypes.map((user, idx) => (
+            <Grid item xs={12} sm={6} md={4} key={user.label}>
+              <StyledCard
+                style={{ background: user.bg }}
+                onClick={() => navigateHandler(user.label)}
+              >
+                <ImageCircle>
+                  <img src={user.img} alt={user.label} />
+                </ImageCircle>
+                <CardTitle>{user.label}</CardTitle>
+                <CardDesc>{user.desc}</CardDesc>
+              </StyledCard>
+            </Grid>
+          ))}
         </Grid>
       </Container>
       <Backdrop
@@ -132,7 +124,7 @@ const ChooseUser = ({ visitor }) => {
         open={loader}
       >
         <CircularProgress color="inherit" />
-        Please Wait
+        <span style={{ marginLeft: "1rem" }}>Please Wait</span>
       </Backdrop>
       <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
     </StyledContainer>
@@ -141,27 +133,67 @@ const ChooseUser = ({ visitor }) => {
 
 export default ChooseUser;
 
+// Styled Components
 const StyledContainer = styled.div`
-  background: linear-gradient(to bottom, #411d70, #19118b);
-  height: 120vh;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 2rem;
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 20px;
+const Title = styled.h1`
   text-align: center;
-  background-color: #1f1f38;
-  color:rgba(255, 255, 255, 0.6);
-  cursor:pointer;
+  color: #fff;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 2.5rem;
+`;
 
+const StyledCard = styled(Paper)`
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 340px;
   &:hover {
-    background-color: #2c2c6c;
-    color:white;
+    transform: translateY(-8px) scale(1.04);
+    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.37);
+    background: #fff !important;
   }
 `;
 
-const StyledTypography = styled.h2`
-  margin-bottom: 10px;
+const ImageCircle = styled.div`
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1.2rem auto;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
 `;
+
+const CardTitle = styled.h2`
+  font-size: 1.5rem;
+  color: #2d3142;
+  margin-bottom: 0.7rem;
+  font-weight: 600;
+`;
+
+const CardDesc = styled.p`
+  color: #333;
+  font-size: 1rem;
+  opacity: 0.85;
+  margin-bottom: 0;
+`;
+
