@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Table, TableBody, TableContainer, TableHead, Typography, Paper } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTeacherFreeClassSubjects } from '../../../redux/sclassRelated/sclassHandle';
-import { updateTeachSubject } from '../../../redux/teacherRelated/teacherHandle';
+import { updateTeacherSubject } from '../../../redux/teacherRelated/teacherHandle';
 import { GreenButton, PurpleButton } from '../../../components/buttonStyles';
 import { StyledTableCell, StyledTableRow } from '../../../components/styles';
 
@@ -50,7 +50,7 @@ const ChooseSubject = ({ situation }) => {
 
     const updateSubjectHandler = (teacherId, teachSubject) => {
         setLoader(true)
-        dispatch(updateTeachSubject(teacherId, teachSubject))
+        dispatch(updateTeacherSubject(teacherId, teachSubject))
         navigate("/Admin/teachers")
     }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
-import { getAllTeachers } from '../../../redux/teacherRelated/teacherHandle';
+import { getTeachers } from '../../../redux/teacherRelated/teacherHandle';
 import {
     Paper, Table, TableBody, TableContainer,
     TableHead, TablePagination, Button, Box, IconButton,
@@ -24,7 +24,7 @@ const ShowTeachers = () => {
     const { currentUser } = useSelector((state) => state.user);
 
     useEffect(() => {
-        dispatch(getAllTeachers(currentUser._id));
+        dispatch(getTeachers(currentUser._id));
     }, [currentUser._id, dispatch]);
 
     const [showPopup, setShowPopup] = useState(false);

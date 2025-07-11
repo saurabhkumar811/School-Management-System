@@ -1,142 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../../redux/userRelated/userHandle';
-import Popup from '../../../components/Popup';
-import { underControl } from '../../../redux/userRelated/userSlice';
-import { getAllSclasses } from '../../../redux/sclassRelated/sclassHandle';
-import { CircularProgress } from '@mui/material';
+import React, { useState } from "react";
+import axios from "axios";
 
-const AddStudent = ({ situation }) => {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const params = useParams()
+function AddStudent() {
+  const [form, setForm] = useState({
+    admissionNumber: "",
+    fullName: "",
+    dob: "",
+    gender: "",
+    photo: null,
+    bloodGroup: "",
+    nationality: "",
+    religion: "",
+    mobile: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    pinCode: "",
+    parentDetails: {
+      fatherName: "",
+      fatherOccupation: "",
+      fatherMobile: "",
+      motherName: "",
+      motherOccupation: "",
+      motherMobile: "",
+      guardianName: "",
+      guardianRelation: "",
+      guardianContact: "",
+      guardianAddress: ""
+    },
+    class: "",
+    section: "",
+    rollNumber: "",
+    academicYear: "",
+    admissionDate: "",
+    admissionMode: "",
+    previousSchool: "",
+    scholarship: "",
+    username: "",
+    password: "",
+    // ...other fields as needed
+  });
 
-    const userState = useSelector(state => state.user);
-    const { status, currentUser, response, error } = userState;
-    const { sclassesList } = useSelector((state) => state.sclass);
-
-    const [name, setName] = useState('');
-    const [rollNum, setRollNum] = useState('');
-    const [password, setPassword] = useState('')
-    const [className, setClassName] = useState('')
-    const [sclassName, setSclassName] = useState('')
-
-    const adminID = currentUser._id
-    const role = "Student"
-    const attendance = []
-
-    useEffect(() => {
-        if (situation === "Class") {
-            setSclassName(params.id);
-        }
-    }, [params.id, situation]);
-
-    const [showPopup, setShowPopup] = useState(false);
-    const [message, setMessage] = useState("");
-    const [loader, setLoader] = useState(false)
-
-    useEffect(() => {
-        dispatch(getAllSclasses(adminID, "Sclass"));
-    }, [adminID, dispatch]);
-
-    const changeHandler = (event) => {
-        if (event.target.value === 'Select Class') {
-            setClassName('Select Class');
-            setSclassName('');
-        } else {
-            const selectedClass = sclassesList.find(
-                (classItem) => classItem.sclassName === event.target.value
-            );
-            setClassName(selectedClass.sclassName);
-            setSclassName(selectedClass._id);
-        }
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "photo") {
+      setForm({ ...form, photo: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
     }
+  };
 
-    const fields = { name, rollNum, password, sclassName, adminID, role, attendance }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    Object.keys(form).forEach((key) => {
+      if (key === "photo" && form[key]) {
+        data.append(key, form[key]);
+      } else if (typeof form[key] === "object") {
+        data.append(key, JSON.stringify(form[key]));
+      } else {
+        data.append(key, form[key]);
+      }
+    });
+    await axios.post("/api/students", data);
+    alert("Student added!");
+  };
 
-    const submitHandler = (event) => {
-        event.preventDefault()
-        if (sclassName === "") {
-            setMessage("Please select a classname")
-            setShowPopup(true)
-        }
-        else {
-            setLoader(true)
-            dispatch(registerUser(fields, role))
-        }
-    }
-
-    useEffect(() => {
-        if (status === 'added') {
-            dispatch(underControl())
-            navigate(-1)
-        }
-        else if (status === 'failed') {
-            setMessage(response)
-            setShowPopup(true)
-            setLoader(false)
-        }
-        else if (status === 'error') {
-            setMessage("Network Error")
-            setShowPopup(true)
-            setLoader(false)
-        }
-    }, [status, navigate, error, response, dispatch]);
-
-    return (
-        <>
-            <div className="register">
-                <form className="registerForm" onSubmit={submitHandler}>
-                    <span className="registerTitle">Add Student</span>
-                    <label>Name</label>
-                    <input className="registerInput" type="text" placeholder="Enter student's name..."
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        autoComplete="name" required />
-
-                    {
-                        situation === "Student" &&
-                        <>
-                            <label>Class</label>
-                            <select
-                                className="registerInput"
-                                value={className}
-                                onChange={changeHandler} required>
-                                <option value='Select Class'>Select Class</option>
-                                {sclassesList.map((classItem, index) => (
-                                    <option key={index} value={classItem.sclassName}>
-                                        {classItem.sclassName}
-                                    </option>
-                                ))}
-                            </select>
-                        </>
-                    }
-
-                    <label>Roll Number</label>
-                    <input className="registerInput" type="number" placeholder="Enter student's Roll Number..."
-                        value={rollNum}
-                        onChange={(event) => setRollNum(event.target.value)}
-                        required />
-
-                    <label>Password</label>
-                    <input className="registerInput" type="password" placeholder="Enter student's password..."
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                        autoComplete="new-password" required />
-
-                    <button className="registerButton" type="submit" disabled={loader}>
-                        {loader ? (
-                            <CircularProgress size={24} color="inherit" />
-                        ) : (
-                            'Add'
-                        )}
-                    </button>
-                </form>
-            </div>
-            <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
-        </>
-    )
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="admissionNumber" value={form.admissionNumber} onChange={handleChange} required />
+      <input name="fullName" value={form.fullName} onChange={handleChange} required />
+      <input name="dob" type="date" value={form.dob} onChange={handleChange} />
+      <input name="gender" value={form.gender} onChange={handleChange} />
+      <input name="photo" type="file" onChange={handleChange} />
+      {/* Add all other fields similarly */}
+      <button type="submit">Add Student</button>
+    </form>
+  );
 }
 
-export default AddStudent
+export default AddStudent;

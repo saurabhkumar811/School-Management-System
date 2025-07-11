@@ -1,106 +1,94 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
-import { getSubjectDetails } from '../../../redux/sclassRelated/sclassHandle';
-import Popup from '../../../components/Popup';
-import { registerUser } from '../../../redux/userRelated/userHandle';
-import { underControl } from '../../../redux/userRelated/userSlice';
-import { CircularProgress } from '@mui/material';
+import React, { useState } from "react";
+import axios from "axios";
 
-const AddTeacher = () => {
-  const params = useParams()
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+function AddTeacher() {
+  const [form, setForm] = useState({
+    employeeCode: "",
+    fullName: "",
+    dob: "",
+    gender: "",
+    contactNumber: "",
+    email: "",
+    address: "",
+    emergencyContact: { name: "", relation: "", phone: "" },
+    photo: null,
+    designation: "",
+    department: "",
+    subjects: [],
+    classesAssigned: [],
+    dateOfJoining: "",
+    employmentType: "",
+    reportingAuthority: "",
+    qualification: "",
+    experienceYears: "",
+    annualCTC: "",
+    monthlyGross: "",
+    salaryBreakup: {
+      basic: "",
+      hra: "",
+      da: "",
+      specialAllowance: "",
+      transportAllowance: "",
+      medicalAllowance: "",
+      pf: "",
+      pt: "",
+      tds: "",
+      otherDeductions: "",
+      netSalary: ""
+    },
+    paymentCycle: "",
+    paymentMode: "",
+    bankAccountNumber: "",
+    bankName: "",
+    ifscCode: "",
+    panNumber: "",
+    aadharNumber: "",
+    workingDaysPerMonth: "",
+    leaveBalance: { cl: 0, sl: 0, pl: 0 },
+    username: "",
+    password: "",
+    // ...other fields as needed
+  });
 
-  const subjectID = params.id
-
-  const { status, response, error } = useSelector(state => state.user);
-  const { subjectDetails } = useSelector((state) => state.sclass);
-
-  useEffect(() => {
-    dispatch(getSubjectDetails(subjectID, "Subject"));
-  }, [dispatch, subjectID]);
-
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('')
-
-  const [showPopup, setShowPopup] = useState(false);
-  const [message, setMessage] = useState("");
-  const [loader, setLoader] = useState(false)
-
-  const role = "Teacher"
-  const school = subjectDetails && subjectDetails.school
-  const teachSubject = subjectDetails && subjectDetails._id
-  const teachSclass = subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName._id
-
-  const fields = { name, email, password, role, school, teachSubject, teachSclass }
-
-  const submitHandler = (event) => {
-    event.preventDefault()
-    setLoader(true)
-    dispatch(registerUser(fields, role))
-  }
-
-  useEffect(() => {
-    if (status === 'added') {
-      dispatch(underControl())
-      navigate("/Admin/teachers")
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "photo") {
+      setForm({ ...form, photo: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
     }
-    else if (status === 'failed') {
-      setMessage(response)
-      setShowPopup(true)
-      setLoader(false)
-    }
-    else if (status === 'error') {
-      setMessage("Network Error")
-      setShowPopup(true)
-      setLoader(false)
-    }
-  }, [status, navigate, error, response, dispatch]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    Object.keys(form).forEach((key) => {
+      if (key === "photo" && form[key]) {
+        data.append(key, form[key]);
+      } else if (typeof form[key] === "object") {
+        data.append(key, JSON.stringify(form[key]));
+      } else {
+        data.append(key, form[key]);
+      }
+    });
+    await axios.post("/api/teachers", data);
+    alert("Teacher added!");
+  };
 
   return (
-    <div>
-      <div className="register">
-        <form className="registerForm" onSubmit={submitHandler}>
-          <span className="registerTitle">Add Teacher</span>
-          <br />
-          <label>
-            Subject : {subjectDetails && subjectDetails.subName}
-          </label>
-          <label>
-            Class : {subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName.sclassName}
-          </label>
-          <label>Name</label>
-          <input className="registerInput" type="text" placeholder="Enter teacher's name..."
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            autoComplete="name" required />
-
-          <label>Email</label>
-          <input className="registerInput" type="email" placeholder="Enter teacher's email..."
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email" required />
-
-          <label>Password</label>
-          <input className="registerInput" type="password" placeholder="Enter teacher's password..."
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="new-password" required />
-
-          <button className="registerButton" type="submit" disabled={loader}>
-            {loader ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              'Register'
-            )}
-          </button>
-        </form>
-      </div>
-      <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
-    </div>
-  )
+    <form onSubmit={handleSubmit}>
+      <input name="employeeCode" value={form.employeeCode} onChange={handleChange} required />
+      <input name="fullName" value={form.fullName} onChange={handleChange} required />
+      <input name="dob" type="date" value={form.dob} onChange={handleChange} />
+      <input name="gender" value={form.gender} onChange={handleChange} />
+      <input name="contactNumber" value={form.contactNumber} onChange={handleChange} />
+      <input name="email" value={form.email} onChange={handleChange} required />
+      <input name="address" value={form.address} onChange={handleChange} />
+      <input name="photo" type="file" onChange={handleChange} />
+      {/* Add all other fields similarly */}
+      <button type="submit">Add Teacher</button>
+    </form>
+  );
 }
 
-export default AddTeacher
+export default AddTeacher;

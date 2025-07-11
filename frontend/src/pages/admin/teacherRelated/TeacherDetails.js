@@ -1,24 +1,22 @@
 import React, { useEffect } from 'react';
-import { getTeacherDetails } from '../../../redux/teacherRelated/teacherHandle';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, Typography } from '@mui/material';
 
 const TeacherDetails = () => {
     const navigate = useNavigate();
     const params = useParams();
     const dispatch = useDispatch();
-    const { loading, teacherDetails, error } = useSelector((state) => state.teacher);
+    const teacherDetails = useSelector((state) => state.teacher.teacherDetail);
 
     const teacherID = params.id;
 
     useEffect(() => {
-        dispatch(getTeacherDetails(teacherID));
+        if (teacherID) dispatch(getTeacherDetail(teacherID));
     }, [dispatch, teacherID]);
 
-    if (error) {
-        console.log(error);
-    }
+    if (!teacherDetails) return <div>Loading...</div>;
 
     const isSubjectNamePresent = teacherDetails?.teachSubject?.subName;
 
@@ -27,37 +25,31 @@ const TeacherDetails = () => {
     };
 
     return (
-        <>
-            {loading ? (
-                <div>Loading...</div>
+        <Container>
+            <Typography variant="h4" align="center" gutterBottom>
+                Teacher Details
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+                Teacher Name: {teacherDetails?.name || teacherDetails?.fullName}
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+                Class Name: {teacherDetails?.teachSclass?.sclassName}
+            </Typography>
+            {isSubjectNamePresent ? (
+                <>
+                    <Typography variant="h6" gutterBottom>
+                        Subject Name: {teacherDetails?.teachSubject?.subName}
+                    </Typography>
+                    <Typography variant="h6" gutterBottom>
+                        Subject Sessions: {teacherDetails?.teachSubject?.sessions}
+                    </Typography>
+                </>
             ) : (
-                <Container>
-                    <Typography variant="h4" align="center" gutterBottom>
-                        Teacher Details
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                        Teacher Name: {teacherDetails?.name}
-                    </Typography>
-                    <Typography variant="h6" gutterBottom>
-                        Class Name: {teacherDetails?.teachSclass?.sclassName}
-                    </Typography>
-                    {isSubjectNamePresent ? (
-                        <>
-                            <Typography variant="h6" gutterBottom>
-                                Subject Name: {teacherDetails?.teachSubject?.subName}
-                            </Typography>
-                            <Typography variant="h6" gutterBottom>
-                                Subject Sessions: {teacherDetails?.teachSubject?.sessions}
-                            </Typography>
-                        </>
-                    ) : (
-                        <Button variant="contained" onClick={handleAddSubject}>
-                            Add Subject
-                        </Button>
-                    )}
-                </Container>
+                <Button variant="contained" onClick={handleAddSubject}>
+                    Add Subject
+                </Button>
             )}
-        </>
+        </Container>
     );
 };
 
