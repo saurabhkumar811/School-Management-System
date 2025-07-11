@@ -32,7 +32,7 @@ const ShowStudents = () => {
     const { currentUser } = useSelector(state => state.user)
 
     useEffect(() => {
-        dispatch(getAllStudents(currentUser._id));
+        dispatch(getStudents(currentUser._id));
     }, [currentUser._id, dispatch]);
 
     if (error) {
@@ -50,7 +50,7 @@ const ShowStudents = () => {
 
         // dispatch(deleteUser(deleteID, address))
         //     .then(() => {
-        //         dispatch(getAllStudents(currentUser._id));
+        //         dispatch(getStudents(currentUser._id));
         //     })
     }
 
