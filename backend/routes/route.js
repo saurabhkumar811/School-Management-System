@@ -1,9 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const path = require('path');
 
-const teacherUpload = multer({ dest: 'uploads/teachers/' });
-const studentUpload = multer({ dest: 'uploads/students/' });
+// === TEACHER UPLOAD SETUP ===
+const teacherStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/teachers/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const teacherUpload = multer({ storage: teacherStorage });
+
+// === STUDENT UPLOAD SETUP ===
+const studentStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/students/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const studentUpload = multer({ storage: studentStorage });
+
 
 const {
     adminRegister,
@@ -93,7 +116,20 @@ router.put('/RemoveStudentSubAtten/:id', removeStudentAttendanceBySubject);
 router.put('/RemoveStudentAtten/:id', removeStudentAttendance);
 
 // Teacher
-router.post('/TeacherReg', teacherUpload.single('photo'), teacherRegister);
+// router.post('/TeacherReg', teacherUpload.single('photo'), teacherRegister);
+router.post(
+  '/TeacherReg',
+  teacherUpload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'digitalSignature', maxCount: 1 },
+    { name: 'documents.resume', maxCount: 1 },
+    { name: 'documents.idProof', maxCount: 1 },
+    { name: 'documents.joiningLetter', maxCount: 1 },
+    { name: 'documents.qualificationCertificates', maxCount: 10 },
+    { name: 'documents.experienceLetters', maxCount: 10 }
+  ]),
+  teacherRegister
+);
 router.post('/TeacherLogin', teacherLogIn);
 router.get("/Teachers/:id", getTeachers);
 router.get("/Teacher/:id", getTeacherDetail);
@@ -101,7 +137,20 @@ router.delete("/Teachers/:id", deleteTeachers);
 router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
 router.put("/TeacherSubject", updateTeacherSubject);
-router.put('/Teacher/:id', teacherUpload.single('photo'), updateTeacher);
+// router.put('/Teacher/:id', teacherUpload.single('photo'), updateTeacher);
+router.put(
+  '/Teacher/:id',
+  teacherUpload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'digitalSignature', maxCount: 1 },
+    { name: 'documents.resume', maxCount: 1 },
+    { name: 'documents.idProof', maxCount: 1 },
+    { name: 'documents.joiningLetter', maxCount: 1 },
+    { name: 'documents.qualificationCertificates', maxCount: 10 },
+    { name: 'documents.experienceLetters', maxCount: 10 }
+  ]),
+  updateTeacher
+);
 router.post('/TeacherAttendance/:id', teacherAttendance);
 
 // Notice
