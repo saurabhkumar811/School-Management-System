@@ -78,16 +78,36 @@ exports.teacherRegister = async (req, res) => {
 exports.teacherLogIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const teacher = await Teacher.findOne({ email });
+
+    const teacher = await Teacher.findOne({ email })
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subjectName');
+
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
     const valid = await bcrypt.compare(password, teacher.password);
     if (!valid) return res.status(401).json({ message: "Invalid password" });
-    teacher.password = undefined;
-    res.json(teacher);
+
+    // Return teacher data safely
+    const response = {
+    _id: teacher._id,
+    name: teacher.name,
+    email: teacher.email,
+    role: "Teacher",
+    // school: teacher.schoolId,  // Include schoolId here
+    classesAssigned: teacher.classesAssigned || [],
+    subjects: teacher.subjects || []
+};
+
+
+    res.json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
 
 exports.getTeacherDetail = async (req, res) => {
   try {

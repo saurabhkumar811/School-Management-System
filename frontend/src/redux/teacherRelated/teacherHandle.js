@@ -86,3 +86,17 @@ export const updateTeacherSubject = (data) => async (dispatch) => {
     dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
   }
 };
+
+// Login 
+export const teacherLogin = (emailOrUsername, password) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.post(`${REACT_APP_BASE_URL}/TeacherLogin`, {
+      emailOrUsername,
+      password
+    });
+    dispatch(teacherDetailSuccess(res.data));
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};

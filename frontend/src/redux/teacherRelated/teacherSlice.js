@@ -13,10 +13,12 @@ const teacherSlice = createSlice({
   initialState,
   reducers: {
     teacherRequestStart: (state) => {
-      state.loading = true;
-      state.error = null;
-      state.response = null;
-    },
+    state.loading = true;
+    state.error = null;
+    state.response = null;
+    state.teacherDetails = null; // ✅ clear previous details
+},
+
     teacherAddSuccess: (state, action) => {
       state.teachersList.push(action.payload);
       state.loading = false;

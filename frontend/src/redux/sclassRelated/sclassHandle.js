@@ -11,7 +11,9 @@ import {
     getSubDetailsSuccess,
     getSubDetailsRequest
 } from './sclassSlice';
+
 const REACT_APP_BASE_URL = "http://localhost:5001";
+
 export const getAllSclasses = (id, address) => async (dispatch) => {
     dispatch(getRequest());
 
@@ -22,10 +24,10 @@ export const getAllSclasses = (id, address) => async (dispatch) => {
         } else {
             dispatch(getSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
 
 export const getClassStudents = (id) => async (dispatch) => {
     dispatch(getRequest());
@@ -37,10 +39,10 @@ export const getClassStudents = (id) => async (dispatch) => {
         } else {
             dispatch(getStudentsSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
 
 export const getClassDetails = (id, address) => async (dispatch) => {
     dispatch(getRequest());
@@ -50,10 +52,10 @@ export const getClassDetails = (id, address) => async (dispatch) => {
         if (result.data) {
             dispatch(detailsSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
 
 export const getSubjectList = (id, address) => async (dispatch) => {
     dispatch(getRequest());
@@ -65,10 +67,10 @@ export const getSubjectList = (id, address) => async (dispatch) => {
         } else {
             dispatch(getSubjectsSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
 
 export const getTeacherFreeClassSubjects = (id) => async (dispatch) => {
     dispatch(getRequest());
@@ -80,10 +82,10 @@ export const getTeacherFreeClassSubjects = (id) => async (dispatch) => {
         } else {
             dispatch(getSubjectsSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
 
 export const getSubjectDetails = (id, address) => async (dispatch) => {
     dispatch(getSubDetailsRequest());
@@ -93,7 +95,25 @@ export const getSubjectDetails = (id, address) => async (dispatch) => {
         if (result.data) {
             dispatch(getSubDetailsSuccess(result.data));
         }
-    } catch (error) {
-        dispatch(getError(error));
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
     }
-}
+};
+
+// ✅ Get Subject by ID (Fixed version)
+export const getSubject = (subjectId) => async (dispatch) => {
+    if (!subjectId) {
+        console.error("❌ getSubject called with undefined subjectId");
+        return; // Prevent API call
+    }
+
+    dispatch(getRequest());
+
+    try {
+        const res = await axios.get(`${REACT_APP_BASE_URL}/Subject/${subjectId}`);
+        dispatch(getSubjectsSuccess([res.data])); 
+    } catch (err) {
+        dispatch(getError(err.response?.data?.error || err.message));
+    }
+};
+
