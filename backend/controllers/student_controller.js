@@ -3,19 +3,40 @@ const bcrypt = require('bcrypt');
 
 exports.studentRegister = async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const student = new Student({
+    console.log("📥 Incoming Form Data:", req.body);
+    console.log("📸 File:", req.file);
+
+    // ✅ 1. Parse JSON strings (like parentDetails)
+    if (req.body.parentDetails && typeof req.body.parentDetails === "string") {
+      req.body.parentDetails = JSON.parse(req.body.parentDetails);
+    }
+
+    // ✅ 2. Optional: Parse  other nested objects if added in future (marks, health, etc.)
+
+    // ✅ 3. Set photo path
+    const studentData = {
       ...req.body,
-      password: hashedPassword,
-      photo: req.file ? req.file.path : undefined
-    });
-    const result = await student.save();
-    result.password = undefined;
-    res.status(201).json(result);
+      photo: req.file ? req.file.path.replace(/\\/g, "/") : null // fix for Windows path
+    };
+
+    // ✅ 4. Create and save student
+    const student = new Student(studentData);
+    await student.save();
+
+    console.log("✅ Student registered successfully");
+    res.status(201).json({ message: "Student registered successfully", student });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Error registering student:", err);
+    res.status(500).json({
+      message: "Failed to register student",
+      error: err.message,
+      stack: err.stack
+    });
   }
 };
+
+
 
 exports.studentLogIn = async (req, res) => {
   try {

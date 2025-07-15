@@ -12,7 +12,7 @@ import {
     getFailed,
     getError,
 } from './userSlice';
-const REACT_APP_BASE_URL = "http://localhost:5001";
+const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5001";
 export const loginUser = (fields, role) => async (dispatch) => {
     dispatch(authRequest());
 
