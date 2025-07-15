@@ -38,12 +38,22 @@ exports.teacherRegister = async (req, res) => {
       password: hashedPassword,
     };
 
+    // ✅ Validate schoolId
+    // if (!teacherData.schoolId) {
+    //   return res.status(400).json({ error: "schoolId is required" });
+    // }
+
     // Parse nested JSON fields if sent as strings from frontend
     ['emergencyContact', 'salaryBreakup', 'leaveBalance', 'documents'].forEach((field) => {
-      if (teacherData[field] && typeof teacherData[field] === 'string') {
-        teacherData[field] = JSON.parse(teacherData[field]);
-      }
-    });
+  try {
+    if (teacherData[field] && typeof teacherData[field] === 'string') {
+      teacherData[field] = JSON.parse(teacherData[field]);
+    }
+  } catch (err) {
+    console.warn(`Invalid JSON for ${field}, skipping parse.`);
+  }
+});
+
 
     // Parse arrays
     ['subjects', 'classesAssigned'].forEach((field) => {
@@ -93,14 +103,21 @@ exports.getTeacherDetail = async (req, res) => {
   }
 };
 
+
 exports.getTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().select('-password');
-    res.json(teachers);
+    const teachers = await Teacher.find()
+      .populate('subjects')
+      .populate('classesAssigned');
+
+    res.status(200).json(teachers);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
 
 exports.updateTeacher = async (req, res) => {
   try {

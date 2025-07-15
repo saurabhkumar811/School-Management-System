@@ -62,14 +62,17 @@ const ShowTeachers = () => {
     ];
 
     const rows = teachersList.map((teacher) => {
-        return {
-            name: teacher.name,
-            teachSubject: teacher.teachSubject?.subName || null,
-            teachSclass: teacher.teachSclass.sclassName,
-            teachSclassID: teacher.teachSclass._id,
-            id: teacher._id,
-        };
-    });
+    const firstClass = teacher.classesAssigned?.[0];  // ✅ Use first class if exists
+
+    return {
+        name: teacher.fullName,
+        teachSubject: teacher.subjects?.[0]?.subName || "Not Assigned",   // ✅ Use subjects array
+        teachSclass: firstClass?.sclassName || "Not Assigned",             // ✅ Handle safely
+        teachSclassID: firstClass?._id || null,
+        id: teacher._id,
+    };
+});
+
 
     const actions = [
         {

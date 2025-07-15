@@ -1,513 +1,253 @@
-import React, { useState } from "react";
-import axios from "axios";
-import {
-  Container,
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Typography,
-  MenuItem,
-  InputLabel,
-  Select,
-  FormControl,
-  OutlinedInput,
-  Chip,
-  Box
-} from "@mui/material";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTeacher } from '../../../redux/teacherRelated/teacherHandle';
+import { useNavigate } from 'react-router-dom';
 
-const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5001";
-// will work if all the enum types are filled and basic salary is given any amount
-// Placeholder data for subjects and classes (replace with API fetch in production)
-const SUBJECTS = [
-  { _id: "sub1", name: "Mathematics" },
-  { _id: "sub2", name: "Science" },
-  { _id: "sub3", name: "English" }
-];
-const CLASSES = [
-  { _id: "cls1", name: "Class 1" },
-  { _id: "cls2", name: "Class 2" },
-  { _id: "cls3", name: "Class 3" }
-];
+const AddTeacher = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.teacher);
+  const { currentUser } = useSelector((state) => state.user);
 
-function AddTeacher() {
-  const [form, setForm] = useState({
-    employeeCode: "",
-    fullName: "",
-    dob: "",
-    gender: "",
-    contactNumber: "",
-    email: "",
-    address: "",
-    emergencyContact: { name: "", relation: "", phone: "" },
-    photo: null,
-    designation: "",
-    department: "",
-    subjects: [],
-    classesAssigned: [],
-    dateOfJoining: "",
-    employmentType: "",
-    reportingAuthority: "",
-    qualification: "",
-    experienceYears: "",
-    annualCTC: "",
-    monthlyGross: "",
+  const [formData, setFormData] = useState({
+    employeeCode: '',
+    fullName: '',
+    dob: '',
+    gender: '',
+    contactNumber: '',
+    email: '',
+    password: '',
+    address: '',
+    emergencyContact: {
+      name: '',
+      relation: '',
+      phone: ''
+    },
     salaryBreakup: {
-      basic: "",
-      hra: "",
-      da: "",
-      specialAllowance: "",
-      transportAllowance: "",
-      medicalAllowance: "",
-      pf: "",
-      pt: "",
-      tds: "",
-      otherDeductions: "",
-      netSalary: ""
+      basic: '',
+      hra: '',
+      da: '',
+      specialAllowance: '',
+      transportAllowance: '',
+      medicalAllowance: '',
+      pf: '',
+      pt: '',
+      tds: '',
+      otherDeductions: '',
+      netSalary: ''
     },
-    paymentCycle: "",
-    paymentMode: "",
-    bankAccountNumber: "",
-    bankName: "",
-    ifscCode: "",
-    panNumber: "",
-    aadharNumber: "",
-    workingDaysPerMonth: "",
-    leaveBalance: { cl: 0, sl: 0, pl: 0 },
-    username: "",
-    password: "",
-    documents: {
-      resume: null,
-      qualificationCertificates: [],
-      idProof: null,
-      experienceLetters: [],
-      joiningLetter: null
+    leaveBalance: {
+      cl: '',
+      sl: '',
+      pl: ''
     },
-    digitalSignature: null
+    employmentType: 'Permanent',
+    paymentCycle: 'Monthly',
+    paymentMode: 'Bank Transfer',
+    bankAccountNumber: '',
+    bankName: '',
+    ifscCode: '',
+    panNumber: '',
+    aadharNumber: '',
+    annualCTC: '',
+    monthlyGross: '',
+    username: '',
+    reportingAuthority: '',
+    qualification: '',
+    experienceYears: '',
+    workingDaysPerMonth: ''
   });
 
-  // Handle regular and nested field changes
-  const handleChange = (e) => {
-    const { name, value, files, type, multiple } = e.target;
+  const [files, setFiles] = useState({
+    photo: null,
+    digitalSignature: null,
+    resume: null,
+    idProof: null,
+    joiningLetter: null,
+    qualificationCertificates: [],
+    experienceLetters: []
+  });
 
-    // File fields
-    if (name === "photo") {
-      setForm({ ...form, photo: files[0] });
-    } else if (name.startsWith("documents.")) {
-      const field = name.split(".")[1];
-      if (multiple) {
-        setForm({
-          ...form,
-          documents: { ...form.documents, [field]: Array.from(files) }
-        });
-      } else {
-        setForm({
-          ...form,
-          documents: { ...form.documents, [field]: files[0] }
-        });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNestedChange = (section, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
       }
-    }
-    // Nested fields
-    else if (name.startsWith("emergencyContact.")) {
-      const field = name.split(".")[1];
-      setForm({
-        ...form,
-        emergencyContact: { ...form.emergencyContact, [field]: value }
-      });
-    } else if (name.startsWith("salaryBreakup.")) {
-      const field = name.split(".")[1];
-      setForm({
-        ...form,
-        salaryBreakup: { ...form.salaryBreakup, [field]: value }
-      });
-    } else if (name.startsWith("leaveBalance.")) {
-      const field = name.split(".")[1];
-      setForm({
-        ...form,
-        leaveBalance: { ...form.leaveBalance, [field]: value }
-      });
-    }
-    // Array fields (subjects, classesAssigned)
-    else if (name === "subjects" || name === "classesAssigned") {
-      setForm({ ...form, [name]: typeof value === "string" ? value.split(",") : value });
-    }
-    // Digital signature (file)
-    else if (name === "digitalSignature") {
-      setForm({ ...form, digitalSignature: files[0] });
-    }
-    // Regular fields
-    else {
-      setForm({ ...form, [name]: value });
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files: selectedFiles } = e.target;
+    if (name === 'qualificationCertificates' || name === 'experienceLetters') {
+      setFiles(prev => ({ ...prev, [name]: [...selectedFiles] }));
+    } else {
+      setFiles(prev => ({ ...prev, [name]: selectedFiles[0] }));
     }
   };
 
-  // Handle form submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const data = new FormData();
 
-    // Append simple fields
-    for (const key in form) {
-      if (
-        [
-          "photo",
-          "digitalSignature"
-        ].includes(key)
-      ) {
-        if (form[key]) data.append(key, form[key]);
-      }
-      // Nested objects/arrays
-      else if (
-        ["emergencyContact", "salaryBreakup", "leaveBalance"].includes(key)
-      ) {
-        data.append(key, JSON.stringify(form[key]));
-      }
-      // Subjects/classesAssigned as array of IDs
-      else if (["subjects", "classesAssigned"].includes(key)) {
-        data.append(key, JSON.stringify(form[key]));
-      }
-      // Documents (files and arrays of files)
-      else if (key === "documents") {
-        for (const docKey in form.documents) {
-          const docValue = form.documents[docKey];
-          if (Array.isArray(docValue)) {
-            docValue.forEach((file) => {
-              if (file) data.append(`documents.${docKey}`, file);
-            });
-          } else if (docValue) {
-            data.append(`documents.${docKey}`, docValue);
-          }
-        }
-      }
-      // Everything else
-      else {
-        data.append(key, form[key]);
-      }
-      if (
-        !form.employmentType ||
-        !form.paymentCycle ||
-        !form.paymentMode ||
-        !form.salaryBreakup.basic
-      ) {
-        alert("Please fill all required fields.");
-        return;
-      }
+    const admin = JSON.parse(localStorage.getItem("admin")); // or your logic to get admin
+  const schoolId = admin?._id; // assuming Admin _id is used as schoolId
 
-    }
+    const dataToSend = {
+      ...formData,
+      documents: {
+        resume: files.resume,
+        idProof: files.idProof,
+        joiningLetter: files.joiningLetter,
+        qualificationCertificates: files.qualificationCertificates,
+        experienceLetters: files.experienceLetters
+      },
+      photo: files.photo,
+      digitalSignature: files.digitalSignature
+    };
 
-    try {
-      await axios.post(`${REACT_APP_BASE_URL}/TeacherReg`, data);
-      alert("Teacher added!");
-      // Optionally reset form here
-    } catch (err) {
-      alert("Error adding teacher: " + (err.response?.data?.message || err.message));
-    }
+    dispatch(addTeacher(dataToSend));
+    navigate("/Admin/teachers");
   };
 
   return (
-    <Container maxWidth="md">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-        <Typography variant="h5" gutterBottom>
+    <div className="p-4 max-w-xl mx-auto bg-white shadow-md rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Add Teacher</h2>
+
+      {loading && <p className="text-blue-500 mb-4">Submitting...</p>}
+      {error && <p className="text-red-500 mb-4">Error: {error}</p>}
+
+      <form onSubmit={handleSubmit}>
+
+        {/* Basic Info */}
+        <input type="text" name="employeeCode" placeholder="Employee Code" onChange={handleInputChange} required />
+        <input type="text" name="fullName" placeholder="Full Name" onChange={handleInputChange} required />
+        
+        <div className="mb-4">
+          <label htmlFor="dob" className="block text-sm font-medium text-gray-700 mb-1">
+            Date of Birth <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            id="dob"
+            name="dob"
+            onChange={handleInputChange}
+            required
+            className="w-full border rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <input type="text" name="gender" placeholder="Gender" onChange={handleInputChange} required />
+        <input type="text" name="contactNumber" placeholder="Contact Number" onChange={handleInputChange} required />
+        <input type="email" name="email" placeholder="Email" onChange={handleInputChange} required />
+        <input type="password" name="password" placeholder="Password" onChange={handleInputChange} required />
+        <input type="text" name="address" placeholder="Address" onChange={handleInputChange} />
+
+        {/* Emergency Contact */}
+        <h4 className="mt-4 font-semibold">Emergency Contact:</h4>
+        <input type="text" placeholder="Name" onChange={e => handleNestedChange('emergencyContact', 'name', e.target.value)} />
+        <input type="text" placeholder="Relation" onChange={e => handleNestedChange('emergencyContact', 'relation', e.target.value)} />
+        <input type="text" placeholder="Phone" onChange={e => handleNestedChange('emergencyContact', 'phone', e.target.value)} />
+
+        {/* Bank Details */}
+        <h4 className="mt-4 font-semibold">Bank Details:</h4>
+        <input type="text" name="bankAccountNumber" placeholder="Bank Account Number" onChange={handleInputChange} />
+        <input type="text" name="bankName" placeholder="Bank Name" onChange={handleInputChange} />
+        <input type="text" name="ifscCode" placeholder="IFSC Code" onChange={handleInputChange} />
+        <input type="text" name="panNumber" placeholder="PAN Number" onChange={handleInputChange} />
+        <input type="text" name="aadharNumber" placeholder="Aadhar Number" onChange={handleInputChange} />
+        <input type="number" name="annualCTC" placeholder="Annual CTC" onChange={handleInputChange} />
+        <input type="number" name="monthlyGross" placeholder="Monthly Gross" onChange={handleInputChange} />
+        <input type="text" name="username" placeholder="Username" onChange={handleInputChange} />
+        <input type="text" name="reportingAuthority" placeholder="Reporting Authority" onChange={handleInputChange} />
+        <input type="text" name="qualification" placeholder="Qualification" onChange={handleInputChange} />
+        <input type="number" name="experienceYears" placeholder="Experience Years" onChange={handleInputChange} />
+        <input type="number" name="workingDaysPerMonth" placeholder="Working Days Per Month" onChange={handleInputChange} />
+
+        {/* File Uploads */}
+        <h4 className="text-xl font-semibold mt-6 mb-4">Upload Teacher Documents</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* Personal Documents */}
+          <div className="space-y-4">
+            <h5 className="text-lg font-medium mb-2">Personal Documents</h5>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Photo</label>
+              <input type="file" name="photo" onChange={handleFileChange} className="file-input" />
+              {files.photo && <p className="text-sm text-green-600 mt-1">{files.photo.name}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Digital Signature</label>
+              <input type="file" name="digitalSignature" onChange={handleFileChange} className="file-input" />
+              {files.digitalSignature && <p className="text-sm text-green-600 mt-1">{files.digitalSignature.name}</p>}
+            </div>
+          </div>
+
+          {/* Official Documents */}
+          <div className="space-y-4">
+            <h5 className="text-lg font-medium mb-2">Official Documents</h5>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Resume</label>
+              <input type="file" name="resume" onChange={handleFileChange} className="file-input" />
+              {files.resume && <p className="text-sm text-green-600 mt-1">{files.resume.name}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">ID Proof</label>
+              <input type="file" name="idProof" onChange={handleFileChange} className="file-input" />
+              {files.idProof && <p className="text-sm text-green-600 mt-1">{files.idProof.name}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Joining Letter</label>
+              <input type="file" name="joiningLetter" onChange={handleFileChange} className="file-input" />
+              {files.joiningLetter && <p className="text-sm text-green-600 mt-1">{files.joiningLetter.name}</p>}
+            </div>
+          </div>
+
+          {/* Qualification Certificates */}
+          <div className="md:col-span-1 space-y-2">
+            <h5 className="text-lg font-medium mb-2">Qualification Certificates</h5>
+            <input type="file" name="qualificationCertificates" onChange={handleFileChange} multiple className="file-input" />
+            {files.qualificationCertificates.length > 0 && (
+              <ul className="text-sm text-green-600 mt-1 list-disc list-inside">
+                {Array.from(files.qualificationCertificates).map((file, idx) => (
+                  <li key={idx}>{file.name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Experience Letters */}
+          <div className="md:col-span-1 space-y-2">
+            <h5 className="text-lg font-medium mb-2">Experience Letters</h5>
+            <input type="file" name="experienceLetters" onChange={handleFileChange} multiple className="file-input" />
+            {files.experienceLetters.length > 0 && (
+              <ul className="text-sm text-green-600 mt-1 list-disc list-inside">
+                {Array.from(files.experienceLetters).map((file, idx) => (
+                  <li key={idx}>{file.name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+        </div>
+
+        <button type="submit" className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
           Add Teacher
-        </Typography>
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <Grid container spacing={2}>
-            {/* BASIC INFO */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="employeeCode" label="Employee Code" value={form.employeeCode} onChange={handleChange} required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="fullName" label="Full Name" value={form.fullName} onChange={handleChange} required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="dob" label="Date of Birth" type="date" InputLabelProps={{ shrink: true }} value={form.dob} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="gender" label="Gender" value={form.gender} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="contactNumber" label="Contact Number" value={form.contactNumber} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="email" label="Email" value={form.email} onChange={handleChange} required />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth name="address" label="Address" value={form.address} onChange={handleChange} />
-            </Grid>
-            {/* EMERGENCY CONTACT */}
-            <Grid item xs={12} sm={4}>
-              <TextField fullWidth name="emergencyContact.name" label="Emergency Contact Name" value={form.emergencyContact.name} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField fullWidth name="emergencyContact.relation" label="Relation" value={form.emergencyContact.relation} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField fullWidth name="emergencyContact.phone" label="Emergency Phone" value={form.emergencyContact.phone} onChange={handleChange} />
-            </Grid>
-            {/* PHOTO */}
-            <Grid item xs={12}>
-              <Button variant="outlined" component="label">
-                Upload Photo
-                <input type="file" hidden name="photo" accept="image/*" onChange={handleChange} />
-              </Button>
-              {form.photo && <Typography variant="body2" sx={{ marginLeft: 2 }}>{form.photo.name}</Typography>}
-            </Grid>
-            {/* DESIGNATION/DEPARTMENT */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="designation" label="Designation" value={form.designation} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="department" label="Department" value={form.department} onChange={handleChange} />
-            </Grid>
-            {/* SUBJECTS */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Subjects</InputLabel>
-                <Select
-                  multiple
-                  name="subjects"
-                  value={form.subjects}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Subjects" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((id) => {
-                        const subj = SUBJECTS.find(s => s._id === id);
-                        return <Chip key={id} label={subj?.name || id} />;
-                      })}
-                    </Box>
-                  )}
-                >
-                  {SUBJECTS.map((subject) => (
-                    <MenuItem key={subject._id} value={subject._id}>
-                      {subject.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            {/* CLASSES ASSIGNED */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Classes Assigned</InputLabel>
-                <Select
-                  multiple
-                  name="classesAssigned"
-                  value={form.classesAssigned}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Classes Assigned" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((id) => {
-                        const cls = CLASSES.find(c => c._id === id);
-                        return <Chip key={id} label={cls?.name || id} />;
-                      })}
-                    </Box>
-                  )}
-                >
-                  {CLASSES.map((cls) => (
-                    <MenuItem key={cls._id} value={cls._id}>
-                      {cls.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            {/* DATE OF JOINING */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="dateOfJoining" label="Date of Joining" type="date" InputLabelProps={{ shrink: true }} value={form.dateOfJoining} onChange={handleChange} />
-            </Grid>
-            {/* EMPLOYMENT TYPE */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                name="employmentType"
-                label="Employment Type"
-                value={form.employmentType}
-                onChange={handleChange}
-              >
-                <MenuItem value="">Select</MenuItem>
-                <MenuItem value="Permanent">Permanent</MenuItem>
-                <MenuItem value="Contract">Contract</MenuItem>
-                <MenuItem value="Part-time">Part-time</MenuItem>
-                <MenuItem value="Visiting">Visiting</MenuItem>
-              </TextField>
-            </Grid>
-            {/* REPORTING AUTHORITY */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="reportingAuthority" label="Reporting Authority" value={form.reportingAuthority} onChange={handleChange} />
-            </Grid>
-            {/* QUALIFICATION */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="qualification" label="Qualification" value={form.qualification} onChange={handleChange} />
-            </Grid>
-            {/* EXPERIENCE */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="experienceYears" label="Experience (Years)" type="number" value={form.experienceYears} onChange={handleChange} />
-            </Grid>
-            {/* ANNUAL CTC */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="annualCTC" label="Annual CTC" type="number" value={form.annualCTC} onChange={handleChange} />
-            </Grid>
-            {/* MONTHLY GROSS */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="monthlyGross" label="Monthly Gross" type="number" value={form.monthlyGross} onChange={handleChange} />
-            </Grid>
-            {/* SALARY BREAKUP */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Salary Breakup</Typography>
-            </Grid>
-            {Object.keys(form.salaryBreakup).map((key) => (
-              <Grid item xs={12} sm={4} key={key}>
-                <TextField
-                  fullWidth
-                  name={`salaryBreakup.${key}`}
-                  label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  type="number"
-                  value={form.salaryBreakup[key]}
-                  onChange={handleChange}
-                />
-              </Grid>
-            ))}
-            {/* PAYMENT CYCLE & MODE */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                name="paymentCycle"
-                label="Payment Cycle"
-                value={form.paymentCycle}
-                onChange={handleChange}
-              >
-                <MenuItem value="">Select</MenuItem>
-                <MenuItem value="Monthly">Monthly</MenuItem>
-                <MenuItem value="Quarterly">Quarterly</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                name="paymentMode"
-                label="Payment Mode"
-                value={form.paymentMode}
-                onChange={handleChange}
-              >
-                <MenuItem value="">Select</MenuItem>
-                <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-                <MenuItem value="Cheque">Cheque</MenuItem>
-                <MenuItem value="Cash">Cash</MenuItem>
-              </TextField>
-            </Grid>
-            {/* BANK DETAILS */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="bankAccountNumber" label="Bank Account Number" value={form.bankAccountNumber} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="bankName" label="Bank Name" value={form.bankName} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="ifscCode" label="IFSC Code" value={form.ifscCode} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="panNumber" label="PAN Number" value={form.panNumber} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="aadharNumber" label="Aadhar Number" value={form.aadharNumber} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="workingDaysPerMonth" label="Working Days/Month" type="number" value={form.workingDaysPerMonth} onChange={handleChange} />
-            </Grid>
-            {/* LEAVE BALANCE */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Leave Balance</Typography>
-            </Grid>
-            {["cl", "sl", "pl"].map((type) => (
-              <Grid item xs={12} sm={4} key={type}>
-                <TextField
-                  fullWidth
-                  name={`leaveBalance.${type}`}
-                  label={type.toUpperCase()}
-                  type="number"
-                  value={form.leaveBalance[type]}
-                  onChange={handleChange}
-                />
-              </Grid>
-            ))}
-            {/* USERNAME/PASSWORD */}
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="username" label="Username" value={form.username} onChange={handleChange} required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth name="password" label="Password" type="password" value={form.password} onChange={handleChange} required />
-            </Grid>
-            {/* DOCUMENT UPLOADS */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Document Uploads</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                Resume
-                <input type="file" hidden name="documents.resume" onChange={handleChange} />
-              </Button>
-              {form.documents.resume && <Typography variant="body2">{form.documents.resume.name}</Typography>}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                Qualification Certificates (Multiple)
-                <input type="file" hidden name="documents.qualificationCertificates" multiple onChange={handleChange} />
-              </Button>
-              {form.documents.qualificationCertificates.length > 0 && (
-                <Typography variant="body2">
-                  {form.documents.qualificationCertificates.map((file, idx) => file.name).join(", ")}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                ID Proof
-                <input type="file" hidden name="documents.idProof" onChange={handleChange} />
-              </Button>
-              {form.documents.idProof && <Typography variant="body2">{form.documents.idProof.name}</Typography>}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                Experience Letters (Multiple)
-                <input type="file" hidden name="documents.experienceLetters" multiple onChange={handleChange} />
-              </Button>
-              {form.documents.experienceLetters.length > 0 && (
-                <Typography variant="body2">
-                  {form.documents.experienceLetters.map((file, idx) => file.name).join(", ")}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                Joining Letter
-                <input type="file" hidden name="documents.joiningLetter" onChange={handleChange} />
-              </Button>
-              {form.documents.joiningLetter && <Typography variant="body2">{form.documents.joiningLetter.name}</Typography>}
-            </Grid>
-            {/* DIGITAL SIGNATURE */}
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" component="label" fullWidth>
-                Digital Signature
-                <input type="file" hidden name="digitalSignature" onChange={handleChange} />
-              </Button>
-              {form.digitalSignature && <Typography variant="body2">{form.digitalSignature.name}</Typography>}
-            </Grid>
-            {/* SUBMIT */}
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary">
-                Add Teacher
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
-    </Container>
+        </button>
+      </form>
+    </div>
   );
-}
+};
 
 export default AddTeacher;
