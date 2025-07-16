@@ -178,9 +178,61 @@ exports.deleteTeachersByClass = async (req, res) => {
 exports.deleteTeacher = async (req, res) => {
   res.json({ message: "deleteTeacher endpoint hit" });
 };
+
 exports.updateTeacherSubject = async (req, res) => {
-  res.json({ message: "updateTeacherSubject endpoint hit" });
+  try {
+    const { teacherId, subjects } = req.body;
+
+    if (!teacherId || !subjects) {
+      return res.status(400).json({ error: "teacherId and subjects are required" });
+    }
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // If you want to assign multiple subjects, convert subjects to array
+    // For single subject assignment:
+    teacher.subjects = [subjects]; // Replace with the new subject
+
+    await teacher.save();
+
+    res.status(200).json({ message: "Subject assigned to teacher successfully." });
+  } catch (err) {
+    console.error("Update Teacher Subject Error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
 exports.teacherAttendance = async (req, res) => {
   res.json({ message: "teacherAttendance endpoint hit" });
 };
+
+exports.assignTeacherClass = async (req, res) => {
+  try {
+    const { teacherId, classId } = req.body;
+
+    if (!teacherId || !classId) {
+      return res.status(400).json({ error: "teacherId and classId are required." });
+    }
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found." });
+    }
+
+    // Update classesAssigned field
+    teacher.classesAssigned = [classId];
+    await teacher.save();
+
+    res.status(200).json({
+      message: "Class assigned to teacher successfully.",
+      teacher
+    });
+  } catch (err) {
+    console.error("Assign Teacher Class Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+

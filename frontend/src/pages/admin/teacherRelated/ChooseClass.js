@@ -5,6 +5,8 @@ import { getAllSclasses } from '../../../redux/sclassRelated/sclassHandle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PurpleButton } from '../../../components/buttonStyles';
 import TableTemplate from '../../../components/TableTemplate';
+// import updateTeacherClass from '../../../redux/teacherRelated/teacherHandle'
+import {updateTeacherSubject, assignClassToTeacher} from '../../../redux/teacherRelated/teacherHandle'
 
 const ChooseClass = () => {
     const navigate = useNavigate();
@@ -19,8 +21,12 @@ const ChooseClass = () => {
     }, [currentUser._id, dispatch]);
 
     const navigateHandler = (classID) => {
-        navigate(`/Admin/teachers/choosesubject/${classID}/${teacherId}`);
-    };
+    dispatch(assignClassToTeacher({ teacherId, classId: classID }))
+      .then(() => {
+          navigate(`/Admin/teachers/choosesubject/${classID}/${teacherId}`);
+      });
+};
+
 
     const sclassColumns = [{ id: 'name', label: 'Class Name', minWidth: 170 }];
 

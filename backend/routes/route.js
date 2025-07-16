@@ -91,7 +91,8 @@ const {
     deleteTeacher,
     updateTeacherSubject,
     updateTeacher,
-    teacherAttendance
+    teacherAttendance,
+    assignTeacherClass
 } = require('../controllers/teacher-controller.js');
 
 // Admin
@@ -133,20 +134,14 @@ router.post(
 );
 
 router.post('/TeacherLogin', teacherLogIn);
-
-// ✅ Get teachers by schoolId
 router.get("/Teachers/:id", getTeachers);
-
-// ✅ (Optional) Get all teachers (no filter)
 router.get("/Teachers", getTeachers);
-
 router.get("/Teacher/:id", getTeacherDetail);
-
 router.delete("/Teachers/:id", deleteTeachers);
 router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
-
 router.put("/TeacherSubject", updateTeacherSubject);
+router.put('/TeacherAssignClass', assignTeacherClass);
 
 router.put(
   '/Teacher/:id',
