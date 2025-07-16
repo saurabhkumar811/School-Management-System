@@ -100,3 +100,31 @@ export const teacherLogin = (emailOrUsername, password) => async (dispatch) => {
     dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
   }
 };
+
+// ✅ Assign Class to Teacher
+export const assignClassToTeacher = ({ teacherId, classId }) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.put(`${REACT_APP_BASE_URL}/TeacherAssignClass`, {
+      teacherId,
+      classId
+    });
+    dispatch(teacherDetailSuccess(res.data));
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};
+
+// ✅ Assign Subject to Teacher
+export const assignSubjectToTeacher = ({ teacherId, subjectId }) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.put(`${REACT_APP_BASE_URL}/TeacherAssignSubject`, {
+      teacherId,
+      subjectId
+    });
+    dispatch(teacherDetailSuccess(res.data));
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};
