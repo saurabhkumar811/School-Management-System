@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getClassDetails, getClassStudents, getSubjectList } from "../../../redux/sclassRelated/sclassHandle";
 import { deleteUser } from '../../../redux/userRelated/userHandle';
 import {
-    Box, Container, Typography, Tab, IconButton
+    Box, Container, Typography, Tab, IconButton, Paper, Divider, Stack, Fade, useTheme
 } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -19,7 +19,18 @@ import Popup from "../../../components/Popup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PostAddIcon from '@mui/icons-material/PostAdd';
 
+const glassCard = {
+    background: 'rgba(255,255,255,0.80)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+    backdropFilter: 'blur(8px)',
+    borderRadius: 4,
+    p: { xs: 2, md: 4 },
+    mb: 3,
+    border: '1px solid rgba(255,255,255,0.4)'
+};
+
 const ClassDetails = () => {
+    const theme = useTheme();
     const params = useParams()
     const navigate = useNavigate()
     const dispatch = useDispatch();
@@ -38,25 +49,14 @@ const ClassDetails = () => {
     }
 
     const [value, setValue] = useState('1');
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
     const [showPopup, setShowPopup] = useState(false);
     const [message, setMessage] = useState("");
 
+    const handleChange = (event, newValue) => setValue(newValue);
+
     const deleteHandler = (deleteID, address) => {
-        console.log(deleteID);
-        console.log(address);
-        setMessage("Sorry the delete function has been disabled for now.")
+        setMessage("Sorry, the delete function has been disabled for now.")
         setShowPopup(true)
-        // dispatch(deleteUser(deleteID, address))
-        //     .then(() => {
-        //         dispatch(getClassStudents(classID));
-        //         dispatch(resetSubjects())
-        //         dispatch(getSubjectList(classID, "ClassSubjects"))
-        //     })
     }
 
     const subjectColumns = [
@@ -64,31 +64,25 @@ const ClassDetails = () => {
         { id: 'code', label: 'Subject Code', minWidth: 100 },
     ]
 
-    const subjectRows = subjectsList && subjectsList.length > 0 && subjectsList.map((subject) => {
-        return {
-            name: subject.subName,
-            code: subject.subCode,
-            id: subject._id,
-        };
-    })
+    const subjectRows = subjectsList && subjectsList.length > 0 && subjectsList.map((subject) => ({
+        name: subject.subName,
+        code: subject.subCode,
+        id: subject._id,
+    }));
 
-    const SubjectsButtonHaver = ({ row }) => {
-        return (
-            <>
-                <IconButton onClick={() => deleteHandler(row.id, "Subject")}>
-                    <DeleteIcon color="error" />
-                </IconButton>
-                <BlueButton
-                    variant="contained"
-                    onClick={() => {
-                        navigate(`/Admin/class/subject/${classID}/${row.id}`)
-                    }}
-                >
-                    View
-                </BlueButton >
-            </>
-        );
-    };
+    const SubjectsButtonHaver = ({ row }) => (
+        <Stack direction="row" spacing={1}>
+            <IconButton onClick={() => deleteHandler(row.id, "Subject")}>
+                <DeleteIcon color="error" />
+            </IconButton>
+            <BlueButton
+                variant="contained"
+                onClick={() => navigate(`/Admin/class/subject/${classID}/${row.id}`)}
+            >
+                View
+            </BlueButton>
+        </Stack>
+    );
 
     const subjectActions = [
         {
@@ -101,68 +95,60 @@ const ClassDetails = () => {
         }
     ];
 
-    const ClassSubjectsSection = () => {
-        return (
-            <>
-                {response ?
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                        <GreenButton
-                            variant="contained"
-                            onClick={() => navigate("/Admin/addsubject/" + classID)}
-                        >
-                            Add Subjects
-                        </GreenButton>
-                    </Box>
-                    :
-                    <>
-                        <Typography variant="h5" gutterBottom>
-                            Subjects List:
-                        </Typography>
-
-                        <TableTemplate buttonHaver={SubjectsButtonHaver} columns={subjectColumns} rows={subjectRows} />
-                        <SpeedDialTemplate actions={subjectActions} />
-                    </>
-                }
-            </>
-        )
-    }
+    const ClassSubjectsSection = () => (
+        <Fade in>
+            <Box>
+                <Typography variant="h5" color="#270843" fontWeight={700} mb={2}>
+                    Subjects List
+                </Typography>
+                <Paper elevation={3} sx={{ ...glassCard, mb: 2 }}>
+                    <TableTemplate buttonHaver={SubjectsButtonHaver} columns={subjectColumns} rows={subjectRows} />
+                </Paper>
+                <Box display="flex" justifyContent="flex-end" mt={2}>
+                    <GreenButton
+                        variant="contained"
+                        onClick={() => navigate("/Admin/addsubject/" + classID)}
+                    >
+                        Add Subjects
+                    </GreenButton>
+                </Box>
+                <SpeedDialTemplate actions={subjectActions} />
+            </Box>
+        </Fade>
+    );
 
     const studentColumns = [
         { id: 'name', label: 'Name', minWidth: 170 },
         { id: 'rollNum', label: 'Roll Number', minWidth: 100 },
     ]
 
-    const studentRows = sclassStudents.map((student) => {
-        return {
-            name: student.name,
-            rollNum: student.rollNum,
-            id: student._id,
-        };
-    })
+    const studentRows = sclassStudents.map((student) => ({
+        name: student.name,
+        rollNum: student.rollNum,
+        id: student._id,
+    }));
 
-    const StudentsButtonHaver = ({ row }) => {
-        return (
-            <>
-                <IconButton onClick={() => deleteHandler(row.id, "Student")}>
-                    <PersonRemoveIcon color="error" />
-                </IconButton>
-                <BlueButton
-                    variant="contained"
-                    onClick={() => navigate("/Admin/students/student/" + row.id)}
-                >
-                    View
-                </BlueButton>
-                <PurpleButton
-                    variant="contained"
-                    onClick={() =>
-                        navigate("/Admin/students/student/attendance/" + row.id)
-                    }
-                >
-                    Attendance
-                </PurpleButton>
-            </>
-        );
-    };
+    const StudentsButtonHaver = ({ row }) => (
+        <Stack direction="row" spacing={1}>
+            <IconButton onClick={() => deleteHandler(row.id, "Student")}>
+                <PersonRemoveIcon color="error" />
+            </IconButton>
+            <BlueButton
+                variant="contained"
+                onClick={() => navigate("/Admin/students/student/" + row.id)}
+            >
+                View
+            </BlueButton>
+            <PurpleButton
+                variant="contained"
+                onClick={() =>
+                    navigate("/Admin/students/student/attendance/" + row.id)
+                }
+            >
+                Attendance
+            </PurpleButton>
+        </Stack>
+    );
 
     const studentActions = [
         {
@@ -175,113 +161,146 @@ const ClassDetails = () => {
         },
     ];
 
-    const ClassStudentsSection = () => {
-        return (
-            <>
-                {getresponse ? (
-                    <>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                            <GreenButton
-                                variant="contained"
-                                onClick={() => navigate("/Admin/class/addstudents/" + classID)}
-                            >
-                                Add Students
-                            </GreenButton>
-                        </Box>
-                    </>
-                ) : (
-                    <>
-                        <Typography variant="h5" gutterBottom>
-                            Students List:
-                        </Typography>
-
-                        <TableTemplate buttonHaver={StudentsButtonHaver} columns={studentColumns} rows={studentRows} />
-                        <SpeedDialTemplate actions={studentActions} />
-                    </>
-                )}
-            </>
-        )
-    }
-
-    const ClassTeachersSection = () => {
-        return (
-            <>
-                Teachers
-            </>
-        )
-    }
-
-    const ClassDetailsSection = () => {
-        const numberOfSubjects = subjectsList.length;
-        const numberOfStudents = sclassStudents.length;
-
-        return (
-            <>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Class Details
+    const ClassStudentsSection = () => (
+        <Fade in>
+            <Box>
+                <Typography variant="h5" color="#270843" fontWeight={700} mb={2}>
+                    Students List
                 </Typography>
-                <Typography variant="h5" gutterBottom>
-                    This is Class {sclassDetails && sclassDetails.sclassName}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Number of Subjects: {numberOfSubjects}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Number of Students: {numberOfStudents}
-                </Typography>
-                {getresponse &&
+                <Paper elevation={3} sx={{ ...glassCard, mb: 2 }}>
+                    <TableTemplate buttonHaver={StudentsButtonHaver} columns={studentColumns} rows={studentRows} />
+                </Paper>
+                <Box display="flex" justifyContent="flex-end" mt={2}>
                     <GreenButton
                         variant="contained"
                         onClick={() => navigate("/Admin/class/addstudents/" + classID)}
                     >
                         Add Students
                     </GreenButton>
-                }
-                {response &&
-                    <GreenButton
-                        variant="contained"
-                        onClick={() => navigate("/Admin/addsubject/" + classID)}
-                    >
-                        Add Subjects
-                    </GreenButton>
-                }
-            </>
+                </Box>
+                <SpeedDialTemplate actions={studentActions} />
+            </Box>
+        </Fade>
+    );
+
+    const ClassTeachersSection = () => (
+        <Fade in>
+            <Box>
+                <Typography variant="h5" color="#270843" fontWeight={700} mb={2}>
+                    Teachers
+                </Typography>
+                <Paper elevation={3} sx={{ ...glassCard, mb: 2 }}>
+                    <Typography variant="body1" color="text.secondary">
+                        (Feature coming soon)
+                    </Typography>
+                </Paper>
+            </Box>
+        </Fade>
+    );
+
+    const ClassDetailsSection = () => {
+        const numberOfSubjects = subjectsList.length;
+        const numberOfStudents = sclassStudents.length;
+
+        return (
+            <Fade in>
+                <Paper elevation={4} sx={{
+                    ...glassCard,
+                    mb: 3,
+                    bgcolor: "rgba(236, 233, 247, 0.9)"
+                }}>
+                    <Typography variant="h3" align="center" color="#270843" fontWeight={800} gutterBottom sx={{ letterSpacing: 2 }}>
+                        {sclassDetails?.sclassName || "Class"}
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={4} justifyContent="center" alignItems="center" mb={2}>
+                        <Box>
+                            <Typography variant="h6" color="#270843" fontWeight={600}>
+                                Subjects
+                            </Typography>
+                            <Typography variant="h4" color="primary" fontWeight={700}>
+                                {numberOfSubjects}
+                            </Typography>
+                        </Box>
+                        <Divider orientation="vertical" flexItem sx={{ display: { xs: "none", md: "block" } }} />
+                        <Box>
+                            <Typography variant="h6" color="#270843" fontWeight={600}>
+                                Students
+                            </Typography>
+                            <Typography variant="h4" color="primary" fontWeight={700}>
+                                {numberOfStudents}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                    <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
+                        <GreenButton
+                            variant="contained"
+                            onClick={() => navigate("/Admin/class/addstudents/" + classID)}
+                        >
+                            Add Students
+                        </GreenButton>
+                        <GreenButton
+                            variant="contained"
+                            onClick={() => navigate("/Admin/addsubject/" + classID)}
+                        >
+                            Add Subjects
+                        </GreenButton>
+                    </Stack>
+                </Paper>
+            </Fade>
         );
     }
 
     return (
         <>
             {loading ? (
-                <div>Loading...</div>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
+                    <Typography variant="h6">Loading...</Typography>
+                </Box>
             ) : (
-                <>
-                    <Box sx={{ width: '100%', typography: 'body1', }} >
+                <Box sx={{
+                    width: '100%',
+                    minHeight: '100vh',
+                    background: 'linear-gradient(135deg, #ece9f7 0%, #f5f7fa 100%)'
+                }}>
+                    <Box sx={{
+                        width: '100%',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 10,
+                        bgcolor: 'rgba(255,255,255,0.95)',
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        boxShadow: 2
+                    }}>
                         <TabContext value={value}>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                <TabList onChange={handleChange} sx={{ position: 'fixed', width: '100%', bgcolor: 'background.paper', zIndex: 1 }}>
-                                    <Tab label="Details" value="1" />
-                                    <Tab label="Subjects" value="2" />
-                                    <Tab label="Students" value="3" />
-                                    <Tab label="Teachers" value="4" />
-                                </TabList>
-                            </Box>
-                            <Container sx={{ marginTop: "3rem", marginBottom: "4rem" }}>
-                                <TabPanel value="1">
-                                    <ClassDetailsSection />
-                                </TabPanel>
-                                <TabPanel value="2">
-                                    <ClassSubjectsSection />
-                                </TabPanel>
-                                <TabPanel value="3">
-                                    <ClassStudentsSection />
-                                </TabPanel>
-                                <TabPanel value="4">
-                                    <ClassTeachersSection />
-                                </TabPanel>
-                            </Container>
+                            <TabList onChange={handleChange} centered variant="fullWidth"
+                                TabIndicatorProps={{ style: { background: "#270843", height: 4, borderRadius: 2 } }}
+                            >
+                                <Tab label="Details" value="1" sx={{ fontWeight: 700, fontSize: 16, color: "#270843" }} />
+                                <Tab label="Subjects" value="2" sx={{ fontWeight: 700, fontSize: 16, color: "#270843" }} />
+                                <Tab label="Students" value="3" sx={{ fontWeight: 700, fontSize: 16, color: "#270843" }} />
+                                <Tab label="Teachers" value="4" sx={{ fontWeight: 700, fontSize: 16, color: "#270843" }} />
+                            </TabList>
                         </TabContext>
                     </Box>
-                </>
+                    <Container maxWidth="lg" sx={{ marginTop: "2.5rem", marginBottom: "3rem" }}>
+                        <TabContext value={value}>
+                            <TabPanel value="1">
+                                <ClassDetailsSection />
+                            </TabPanel>
+                            <TabPanel value="2">
+                                <ClassSubjectsSection />
+                            </TabPanel>
+                            <TabPanel value="3">
+                                <ClassStudentsSection />
+                            </TabPanel>
+                            <TabPanel value="4">
+                                <ClassTeachersSection />
+                            </TabPanel>
+                        </TabContext>
+                    </Container>
+                </Box>
             )}
             <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
         </>

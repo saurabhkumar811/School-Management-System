@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IconButton, Box, Menu, MenuItem, ListItemIcon, Tooltip } from '@mui/material';
+import { IconButton, Box, Menu, MenuItem, ListItemIcon, Tooltip, Paper, Typography, Fab, Divider, Stack } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,16 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import styled from 'styled-components';
 import SpeedDialTemplate from '../../../components/SpeedDialTemplate';
 import Popup from '../../../components/Popup';
+
+const glassCard = {
+  background: 'rgba(255,255,255,0.85)',
+  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+  backdropFilter: 'blur(8px)',
+  borderRadius: 4,
+  p: { xs: 2, md: 4 },
+  mb: 3,
+  border: '1px solid rgba(255,255,255,0.4)'
+};
 
 const ShowClasses = () => {
   const navigate = useNavigate()
@@ -37,8 +47,6 @@ const ShowClasses = () => {
   const [message, setMessage] = useState("");
 
   const deleteHandler = (deleteID, address) => {
-    console.log(deleteID);
-    console.log(address);
     setMessage("Sorry the delete function has been disabled for now.")
     setShowPopup(true)
     // dispatch(deleteUser(deleteID, address))
@@ -65,9 +73,11 @@ const ShowClasses = () => {
     ];
     return (
       <ButtonContainer>
-        <IconButton onClick={() => deleteHandler(row.id, "Sclass")} color="secondary">
-          <DeleteIcon color="error" />
-        </IconButton>
+        <Tooltip title="Delete Class">
+          <IconButton onClick={() => deleteHandler(row.id, "Sclass")} color="secondary">
+            <DeleteIcon color="error" />
+          </IconButton>
+        </Tooltip>
         <BlueButton variant="contained"
           onClick={() => navigate("/Admin/classes/class/" + row.id)}>
           View
@@ -95,12 +105,18 @@ const ShowClasses = () => {
             <IconButton
               onClick={handleClick}
               size="small"
-              sx={{ ml: 2 }}
+              sx={{
+                ml: 2,
+                bgcolor: "#f0e6fa",
+                borderRadius: 2,
+                border: "1px solid #270843",
+                '&:hover': { bgcolor: "#e0d1f7" }
+              }}
               aria-controls={open ? 'account-menu' : undefined}
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
             >
-              <h5>Add</h5>
+              <Typography variant="body2" sx={{ mr: 1, color: "#270843", fontWeight: 700 }}>Add</Typography>
               <SpeedDialIcon />
             </IconButton>
           </Tooltip>
@@ -118,8 +134,8 @@ const ShowClasses = () => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          {actions.map((action) => (
-            <MenuItem onClick={action.action}>
+          {actions.map((action, idx) => (
+            <MenuItem onClick={action.action} key={idx}>
               <ListItemIcon fontSize="small">
                 {action.icon}
               </ListItemIcon>
@@ -143,29 +159,73 @@ const ShowClasses = () => {
   ];
 
   return (
-    <>
-      {loading ?
-        <div>Loading...</div>
-        :
-        <>
-          {getresponse ?
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <GreenButton variant="contained" onClick={() => navigate("/Admin/addclass")}>
-                Add Class
-              </GreenButton>
-            </Box>
-            :
-            <>
-              {Array.isArray(sclassesList) && sclassesList.length > 0 &&
-                <TableTemplate buttonHaver={SclassButtonHaver} columns={sclassColumns} rows={sclassRows} />
-              }
-              <SpeedDialTemplate actions={actions} />
-            </>}
-        </>
-      }
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #ece9f7 0%, #f5f7fa 100%)',
+        py: 4,
+        px: { xs: 0, md: 4 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          ...glassCard,
+          width: { xs: '98vw', md: '90vw', lg: '70vw' },
+          maxWidth: 1200,
+          mt: 2
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h4" fontWeight={800} color="#270843" letterSpacing={2}>
+            Classes
+          </Typography>
+          <Fab
+            color="primary"
+            size="medium"
+            onClick={() => navigate("/Admin/addclass")}
+            sx={{
+              bgcolor: "#270843",
+              color: "white",
+              '&:hover': { bgcolor: "#3f1068" },
+              boxShadow: 3
+            }}
+          >
+            <AddCardIcon />
+          </Fab>
+        </Box>
+        <Divider sx={{ mb: 2 }} />
+        {loading ?
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+            <Typography variant="h6">Loading...</Typography>
+          </Box>
+          :
+          <>
+            {getresponse ?
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                <GreenButton variant="contained" onClick={() => navigate("/Admin/addclass")}>
+                  Add Class
+                </GreenButton>
+              </Box>
+              :
+              <>
+                {Array.isArray(sclassesList) && sclassesList.length > 0 ?
+                  <TableTemplate buttonHaver={SclassButtonHaver} columns={sclassColumns} rows={sclassRows} />
+                  :
+                  <Typography variant="h6" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                    No classes found. Click "Add Class" to create one!
+                  </Typography>
+                }
+                <SpeedDialTemplate actions={actions} />
+              </>}
+          </>
+        }
+      </Paper>
       <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
-
-    </>
+    </Box>
   );
 };
 
