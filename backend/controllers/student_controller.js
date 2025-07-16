@@ -65,14 +65,36 @@ exports.getStudentDetail = async (req, res) => {
   }
 };
 
+// exports.getStudents = async (req, res) => {
+//   try {
+//     const students = await Student.find().select('-password');
+//     res.json(students);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 exports.getStudents = async (req, res) => {
+  const adminId = req.params.id;
+  const { classId } = req.query;
+
   try {
-    const students = await Student.find().select('-password');
-    res.json(students);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const filter = { admin: adminId };
+    if (classId) {
+      filter.sclassName = classId;
+    }
+
+    const students = await Student.find(filter)
+      .populate('sclassName')
+      .populate('school')
+      .select('-password'); // optional, to hide password field
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error in getStudents:", error);
+    res.status(500).json({ error: "Failed to fetch students" });
   }
 };
+  
 
 exports.updateStudent = async (req, res) => {
   try {

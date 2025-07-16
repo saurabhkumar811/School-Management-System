@@ -110,21 +110,26 @@ export const addStudent = (studentData) => async (dispatch) => {
 };
 
 // Get All Students (pass id if your backend needs it)
-export const getStudents = (id) => async (dispatch) => {
-  const res = await axios.get(`${REACT_APP_BASE_URL}/Students/${id}`);
-  dispatch({ type: GET_STUDENTS, payload: res.data });
-};
-
-// Get Students By Class
-export const getStudentsByClass = (classId) => async (dispatch) => {
+// export const getStudents = (id) => async (dispatch) => {
+//   const res = await axios.get(`${REACT_APP_BASE_URL}/Students/${id}`);
+//   dispatch({ type: GET_STUDENTS, payload: res.data });
+// };
+// Get Students with optional class filter
+export const getStudents = (adminId, classId = null) => async (dispatch) => {
   try {
-    const res = await axios.get(`${REACT_APP_BASE_URL}/StudentsByClass/${classId}`);
+    let url = `${REACT_APP_BASE_URL}/Students/${adminId}`;
+    if (classId) {
+      url += `?classId=${classId}`;
+    }
+
+    const res = await axios.get(url);
     dispatch({ type: GET_STUDENTS, payload: res.data });
   } catch (error) {
-    console.error("Failed to fetch students by class:", error);
-    // You can dispatch an error action here if you want
+    console.error("Error fetching students:", error);
   }
 };
+
+
 
 // Get Single Student Detail
 export const getStudentDetail = (id) => async (dispatch) => {
