@@ -35,6 +35,7 @@ const TeacherDetails = () => {
             return;
         }
         navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
+
     };
 
     return (
