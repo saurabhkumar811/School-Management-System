@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTeacher } from '../../../redux/teacherRelated/teacherHandle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const AddTeacher = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams();
+
   const { loading, error } = useSelector((state) => state.teacher);
   const { currentUser } = useSelector((state) => state.user);
 
+  // ✅ Always call hooks at top-level
   const [formData, setFormData] = useState({
     employeeCode: '',
     fullName: '',
@@ -18,29 +21,12 @@ const AddTeacher = () => {
     email: '',
     password: '',
     address: '',
-    emergencyContact: {
-      name: '',
-      relation: '',
-      phone: ''
-    },
+    emergencyContact: { name: '', relation: '', phone: '' },
     salaryBreakup: {
-      basic: '',
-      hra: '',
-      da: '',
-      specialAllowance: '',
-      transportAllowance: '',
-      medicalAllowance: '',
-      pf: '',
-      pt: '',
-      tds: '',
-      otherDeductions: '',
-      netSalary: ''
+      basic: '', hra: '', da: '', specialAllowance: '', transportAllowance: '',
+      medicalAllowance: '', pf: '', pt: '', tds: '', otherDeductions: '', netSalary: ''
     },
-    leaveBalance: {
-      cl: '',
-      sl: '',
-      pl: ''
-    },
+    leaveBalance: { cl: '', sl: '', pl: '' },
     employmentType: 'Permanent',
     paymentCycle: 'Monthly',
     paymentMode: 'Bank Transfer',
@@ -68,6 +54,12 @@ const AddTeacher = () => {
     experienceLetters: []
   });
 
+  // ✅ Only JSX returns are conditional (not hooks)
+  if (id !== "new") {
+    return <div>Invalid access. Please go to Admin ➔ Teachers ➔ Add Teacher.</div>;
+  }
+
+  // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -95,8 +87,8 @@ const AddTeacher = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const admin = JSON.parse(localStorage.getItem("admin")); // or your logic to get admin
-  const schoolId = admin?._id; // assuming Admin _id is used as schoolId
+    const admin = JSON.parse(localStorage.getItem("admin"));
+    const schoolId = admin?._id;
 
     const dataToSend = {
       ...formData,
@@ -108,7 +100,8 @@ const AddTeacher = () => {
         experienceLetters: files.experienceLetters
       },
       photo: files.photo,
-      digitalSignature: files.digitalSignature
+      digitalSignature: files.digitalSignature,
+      schoolId: schoolId
     };
 
     dispatch(addTeacher(dataToSend));
@@ -123,38 +116,20 @@ const AddTeacher = () => {
       {error && <p className="text-red-500 mb-4">Error: {error}</p>}
 
       <form onSubmit={handleSubmit}>
-
-        {/* Basic Info */}
         <input type="text" name="employeeCode" placeholder="Employee Code" onChange={handleInputChange} required />
         <input type="text" name="fullName" placeholder="Full Name" onChange={handleInputChange} required />
-        
-        <div className="mb-4">
-          <label htmlFor="dob" className="block text-sm font-medium text-gray-700 mb-1">
-            Date of Birth <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            id="dob"
-            name="dob"
-            onChange={handleInputChange}
-            required
-            className="w-full border rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
+        <input type="date" name="dob" onChange={handleInputChange} required />
         <input type="text" name="gender" placeholder="Gender" onChange={handleInputChange} required />
         <input type="text" name="contactNumber" placeholder="Contact Number" onChange={handleInputChange} required />
         <input type="email" name="email" placeholder="Email" onChange={handleInputChange} required />
         <input type="password" name="password" placeholder="Password" onChange={handleInputChange} required />
         <input type="text" name="address" placeholder="Address" onChange={handleInputChange} />
 
-        {/* Emergency Contact */}
         <h4 className="mt-4 font-semibold">Emergency Contact:</h4>
         <input type="text" placeholder="Name" onChange={e => handleNestedChange('emergencyContact', 'name', e.target.value)} />
         <input type="text" placeholder="Relation" onChange={e => handleNestedChange('emergencyContact', 'relation', e.target.value)} />
         <input type="text" placeholder="Phone" onChange={e => handleNestedChange('emergencyContact', 'phone', e.target.value)} />
 
-        {/* Bank Details */}
         <h4 className="mt-4 font-semibold">Bank Details:</h4>
         <input type="text" name="bankAccountNumber" placeholder="Bank Account Number" onChange={handleInputChange} />
         <input type="text" name="bankName" placeholder="Bank Name" onChange={handleInputChange} />
@@ -169,77 +144,43 @@ const AddTeacher = () => {
         <input type="number" name="experienceYears" placeholder="Experience Years" onChange={handleInputChange} />
         <input type="number" name="workingDaysPerMonth" placeholder="Working Days Per Month" onChange={handleInputChange} />
 
-        {/* File Uploads */}
         <h4 className="text-xl font-semibold mt-6 mb-4">Upload Teacher Documents</h4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Personal Documents */}
-          <div className="space-y-4">
-            <h5 className="text-lg font-medium mb-2">Personal Documents</h5>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Photo</label>
-              <input type="file" name="photo" onChange={handleFileChange} className="file-input" />
-              {files.photo && <p className="text-sm text-green-600 mt-1">{files.photo.name}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Digital Signature</label>
-              <input type="file" name="digitalSignature" onChange={handleFileChange} className="file-input" />
-              {files.digitalSignature && <p className="text-sm text-green-600 mt-1">{files.digitalSignature.name}</p>}
-            </div>
+          <div>
+            <label>Photo</label>
+            <input type="file" name="photo" onChange={handleFileChange} />
           </div>
 
-          {/* Official Documents */}
-          <div className="space-y-4">
-            <h5 className="text-lg font-medium mb-2">Official Documents</h5>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Resume</label>
-              <input type="file" name="resume" onChange={handleFileChange} className="file-input" />
-              {files.resume && <p className="text-sm text-green-600 mt-1">{files.resume.name}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">ID Proof</label>
-              <input type="file" name="idProof" onChange={handleFileChange} className="file-input" />
-              {files.idProof && <p className="text-sm text-green-600 mt-1">{files.idProof.name}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Joining Letter</label>
-              <input type="file" name="joiningLetter" onChange={handleFileChange} className="file-input" />
-              {files.joiningLetter && <p className="text-sm text-green-600 mt-1">{files.joiningLetter.name}</p>}
-            </div>
+          <div>
+            <label>Digital Signature</label>
+            <input type="file" name="digitalSignature" onChange={handleFileChange} />
           </div>
 
-          {/* Qualification Certificates */}
-          <div className="md:col-span-1 space-y-2">
-            <h5 className="text-lg font-medium mb-2">Qualification Certificates</h5>
-            <input type="file" name="qualificationCertificates" onChange={handleFileChange} multiple className="file-input" />
-            {files.qualificationCertificates.length > 0 && (
-              <ul className="text-sm text-green-600 mt-1 list-disc list-inside">
-                {Array.from(files.qualificationCertificates).map((file, idx) => (
-                  <li key={idx}>{file.name}</li>
-                ))}
-              </ul>
-            )}
+          <div>
+            <label>Resume</label>
+            <input type="file" name="resume" onChange={handleFileChange} />
           </div>
 
-          {/* Experience Letters */}
-          <div className="md:col-span-1 space-y-2">
-            <h5 className="text-lg font-medium mb-2">Experience Letters</h5>
-            <input type="file" name="experienceLetters" onChange={handleFileChange} multiple className="file-input" />
-            {files.experienceLetters.length > 0 && (
-              <ul className="text-sm text-green-600 mt-1 list-disc list-inside">
-                {Array.from(files.experienceLetters).map((file, idx) => (
-                  <li key={idx}>{file.name}</li>
-                ))}
-              </ul>
-            )}
+          <div>
+            <label>ID Proof</label>
+            <input type="file" name="idProof" onChange={handleFileChange} />
           </div>
 
+          <div>
+            <label>Joining Letter</label>
+            <input type="file" name="joiningLetter" onChange={handleFileChange} />
+          </div>
+
+          <div>
+            <label>Qualification Certificates</label>
+            <input type="file" name="qualificationCertificates" onChange={handleFileChange} multiple />
+          </div>
+
+          <div>
+            <label>Experience Letters</label>
+            <input type="file" name="experienceLetters" onChange={handleFileChange} multiple />
+          </div>
         </div>
 
         <button type="submit" className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

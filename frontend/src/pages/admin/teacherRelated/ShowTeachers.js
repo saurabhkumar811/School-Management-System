@@ -35,7 +35,7 @@ const ShowTeachers = () => {
     } else if (response) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                <GreenButton variant="contained" onClick={() => navigate("/Admin/teachers/chooseclass")}>
+                <GreenButton variant="contained" onClick={() => navigate("/Admin/teachers/addteacher/new")}>
                     Add Teacher
                 </GreenButton>
             </Box>
@@ -77,7 +77,7 @@ const ShowTeachers = () => {
     const actions = [
         {
             icon: <PersonAddAlt1Icon color="primary" />, name: 'Add New Teacher',
-            action: () => navigate("/Admin/teachers/chooseclass")
+            action: () => navigate("/Admin/teachers/addteacher/new")
         },
         {
             icon: <PersonRemoveIcon color="error" />, name: 'Delete All Teachers',
