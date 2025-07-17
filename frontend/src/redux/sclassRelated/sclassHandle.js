@@ -11,9 +11,14 @@ import {
     getSubDetailsSuccess,
     getSubDetailsRequest
 } from './sclassSlice';
+// <<<<<<< main
 
-const REACT_APP_BASE_URL = "http://localhost:5001";
+// const REACT_APP_BASE_URL = "http://localhost:5001";
 
+// =======
+// const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5001";
+// >>>>>>> main
+const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5001";
 export const getAllSclasses = (id, address) => async (dispatch) => {
     dispatch(getRequest());
 
@@ -34,6 +39,7 @@ export const getClassStudents = (id) => async (dispatch) => {
 
     try {
         const result = await axios.get(`${REACT_APP_BASE_URL}/Sclass/Students/${id}`);
+        console.log("result",result);
         if (result.data.message) {
             dispatch(getFailedTwo(result.data.message));
         } else {
