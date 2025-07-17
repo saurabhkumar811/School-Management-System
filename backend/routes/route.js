@@ -92,7 +92,8 @@ const {
     deleteTeacher,
     updateTeacherSubject,
     updateTeacher,
-    teacherAttendance
+    teacherAttendance,
+    assignTeacherClass
 } = require('../controllers/teacher-controller.js');
 
 // Admin
@@ -117,7 +118,8 @@ router.put('/RemoveStudentSubAtten/:id', removeStudentAttendanceBySubject);
 router.put('/RemoveStudentAtten/:id', removeStudentAttendance);
 
 // Teacher
-// router.post('/TeacherReg', teacherUpload.single('photo'), teacherRegister);
+// Teacher Routes
+
 router.post(
   '/TeacherReg',
   teacherUpload.fields([
@@ -131,14 +133,17 @@ router.post(
   ]),
   teacherRegister
 );
+
 router.post('/TeacherLogin', teacherLogIn);
 router.get("/Teachers/:id", getTeachers);
+router.get("/Teachers", getTeachers);
 router.get("/Teacher/:id", getTeacherDetail);
 router.delete("/Teachers/:id", deleteTeachers);
 router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
 router.put("/TeacherSubject", updateTeacherSubject);
-// router.put('/Teacher/:id', teacherUpload.single('photo'), updateTeacher);
+router.put('/TeacherAssignClass', assignTeacherClass);
+
 router.put(
   '/Teacher/:id',
   teacherUpload.fields([
@@ -152,6 +157,7 @@ router.put(
   ]),
   updateTeacher
 );
+
 router.post('/TeacherAttendance/:id', teacherAttendance);
 
 // Notice

@@ -1,82 +1,72 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material';
 import { getAllSclasses } from '../../../redux/sclassRelated/sclassHandle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { PurpleButton } from '../../../components/buttonStyles';
 import TableTemplate from '../../../components/TableTemplate';
+// import updateTeacherClass from '../../../redux/teacherRelated/teacherHandle'
+import {updateTeacherSubject, assignClassToTeacher} from '../../../redux/teacherRelated/teacherHandle'
 
-const ChooseClass = ({ situation }) => {
-    const navigate = useNavigate()
+const ChooseClass = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { id: teacherId } = useParams();
 
     const { sclassesList, loading, error, getresponse } = useSelector((state) => state.sclass);
-    const { currentUser } = useSelector(state => state.user)
+    const { currentUser } = useSelector(state => state.user);
 
     useEffect(() => {
         dispatch(getAllSclasses(currentUser._id, "Sclass"));
     }, [currentUser._id, dispatch]);
 
-    if (error) {
-        console.log(error)
-    }
-
     const navigateHandler = (classID) => {
-        if (situation === "Teacher") {
-            navigate("/Admin/teachers/choosesubject/" + classID)
-        }
-        else if (situation === "Subject") {
-            navigate("/Admin/addsubject/" + classID)
-        }
-    }
+    dispatch(assignClassToTeacher({ teacherId, classId: classID }))
+      .then(() => {
+          navigate(`/Admin/teachers/choosesubject/${classID}/${teacherId}`);
+      });
+};
 
-    const sclassColumns = [
-        { id: 'name', label: 'Class Name', minWidth: 170 },
-    ]
 
-    const sclassRows = sclassesList && sclassesList.length > 0 && sclassesList.map((sclass) => {
-        return {
-            name: sclass.sclassName,
-            id: sclass._id,
-        };
-    })
+    const sclassColumns = [{ id: 'name', label: 'Class Name', minWidth: 170 }];
 
-    const SclassButtonHaver = ({ row }) => {
-        return (
-            <>
-                <PurpleButton variant="contained"
-                    onClick={() => navigateHandler(row.id)}>
-                    Choose
-                </PurpleButton>
-            </>
-        );
-    };
+    const sclassRows = sclassesList?.map(sclass => ({
+        name: sclass.sclassName,
+        id: sclass._id,
+    }));
+
+    const SclassButtonHaver = ({ row }) => (
+        <PurpleButton variant="contained" onClick={() => navigateHandler(row.id)}>
+            Choose
+        </PurpleButton>
+    );
 
     return (
         <>
-            {loading ?
+            {loading ? (
                 <div>Loading...</div>
-                :
+            ) : getresponse ? (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                    <Button variant="contained" onClick={() => navigate("/Admin/addclass")}>
+                        Add Class
+                    </Button>
+                </Box>
+            ) : (
                 <>
-                    {getresponse ?
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                            <Button variant="contained" onClick={() => navigate("/Admin/addclass")}>
-                                Add Class
-                            </Button>
-                        </Box>
-                        :
-                        <>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Choose a class
-                            </Typography>
-                            {Array.isArray(sclassesList) && sclassesList.length > 0 &&
-                                <TableTemplate buttonHaver={SclassButtonHaver} columns={sclassColumns} rows={sclassRows} />
-                            }
-                        </>}
+                    <Typography variant="h6" gutterBottom>
+                        Choose a Class for the Teacher
+                    </Typography>
+                    {sclassesList.length > 0 && (
+                        <TableTemplate
+                            buttonHaver={SclassButtonHaver}
+                            columns={sclassColumns}
+                            rows={sclassRows}
+                        />
+                    )}
                 </>
-            }
+            )}
         </>
-    )
-}
+    );
+};
 
-export default ChooseClass
+export default ChooseClass;

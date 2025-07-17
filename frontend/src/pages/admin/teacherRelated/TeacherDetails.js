@@ -1,54 +1,79 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Typography, Box } from '@mui/material';
 
 const TeacherDetails = () => {
-    const navigate = useNavigate();
-    const params = useParams();
     const dispatch = useDispatch();
-    const teacherDetails = useSelector((state) => state.teacher.teacherDetail);
+    const navigate = useNavigate();
+    const { id } = useParams();
 
-    const teacherID = params.id;
+    const { teacherDetails, loading } = useSelector((state) => state.teacher);
 
     useEffect(() => {
-        if (teacherID) dispatch(getTeacherDetail(teacherID));
-    }, [dispatch, teacherID]);
+        if (id) {
+            dispatch(getTeacherDetail(id));
+        }
+    }, [dispatch, id]);
 
-    if (!teacherDetails) return <div>Loading...</div>;
+    if (loading || !teacherDetails) {
+        return <div>Loading teacher details...</div>;
+    }
 
-    const isSubjectNamePresent = teacherDetails?.teachSubject?.subName;
+    const assignedClass = teacherDetails?.classesAssigned?.[0];
+    const assignedSubject = teacherDetails?.teachSubject;
 
-    const handleAddSubject = () => {
-        navigate(`/Admin/teachers/choosesubject/${teacherDetails?.teachSclass?._id}/${teacherDetails?._id}`);
+    const handleAssignClass = () => {
+    navigate(`/Admin/teachers/chooseclass/${id}`);
+};
+
+
+    const handleAssignSubject = () => {
+        if (!assignedClass) {
+            alert("Please assign a class before assigning a subject.");
+            return;
+        }
+        navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
+
     };
 
     return (
-        <Container>
+        <Container maxWidth="md">
             <Typography variant="h4" align="center" gutterBottom>
                 Teacher Details
             </Typography>
-            <Typography variant="h6" gutterBottom>
-                Teacher Name: {teacherDetails?.name || teacherDetails?.fullName}
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-                Class Name: {teacherDetails?.teachSclass?.sclassName}
-            </Typography>
-            {isSubjectNamePresent ? (
-                <>
-                    <Typography variant="h6" gutterBottom>
-                        Subject Name: {teacherDetails?.teachSubject?.subName}
+
+            <Box sx={{ my: 3 }}>
+                <Typography variant="h6">Name: {teacherDetails.fullName}</Typography>
+                <Typography variant="h6">Email: {teacherDetails.email}</Typography>
+            </Box>
+
+            <Box sx={{ my: 3 }}>
+                <Typography variant="h5">Class Assignment</Typography>
+                {assignedClass ? (
+                    <Typography sx={{ mt: 1 }}>
+                        Assigned Class: <strong>{assignedClass.sclassName}</strong>
                     </Typography>
-                    <Typography variant="h6" gutterBottom>
-                        Subject Sessions: {teacherDetails?.teachSubject?.sessions}
+                ) : (
+                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
+                        Assign Class
+                    </Button>
+                )}
+            </Box>
+
+            <Box sx={{ my: 3 }}>
+                <Typography variant="h5">Subject Assignment</Typography>
+                {assignedSubject?.subName ? (
+                    <Typography sx={{ mt: 1 }}>
+                        Assigned Subject: <strong>{assignedSubject.subName}</strong>
                     </Typography>
-                </>
-            ) : (
-                <Button variant="contained" onClick={handleAddSubject}>
-                    Add Subject
-                </Button>
-            )}
+                ) : (
+                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
+                        Assign Subject
+                    </Button>
+                )}
+            </Box>
         </Container>
     );
 };

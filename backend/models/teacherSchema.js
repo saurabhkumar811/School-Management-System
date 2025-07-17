@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const salaryBreakupSchema = new mongoose.Schema({
-  basic: { type: Number, required: true },
+  basic: { type: Number },
   hra: { type: Number },
   da: { type: Number },
   specialAllowance: { type: Number },
@@ -36,6 +36,7 @@ const leaveBalanceSchema = new mongoose.Schema({
 }, { _id: false });
 
 const teacherSchema = new mongoose.Schema({
+  schoolId: { type: mongoose.Schema.Types.ObjectId, ref: 'School', },
   employeeCode: { type: String, unique: true, required: true },
   fullName: { type: String, required: true },
   dob: Date,

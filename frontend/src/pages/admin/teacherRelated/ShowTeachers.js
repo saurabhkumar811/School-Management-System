@@ -35,7 +35,7 @@ const ShowTeachers = () => {
     } else if (response) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                <GreenButton variant="contained" onClick={() => navigate("/Admin/teachers/chooseclass")}>
+                <GreenButton variant="contained" onClick={() => navigate("/Admin/teachers/addteacher/new")}>
                     Add Teacher
                 </GreenButton>
             </Box>
@@ -62,19 +62,22 @@ const ShowTeachers = () => {
     ];
 
     const rows = teachersList.map((teacher) => {
-        return {
-            name: teacher.name,
-            teachSubject: teacher.teachSubject?.subName || null,
-            teachSclass: teacher.teachSclass.sclassName,
-            teachSclassID: teacher.teachSclass._id,
-            id: teacher._id,
-        };
-    });
+    const firstClass = teacher.classesAssigned?.[0];  // ✅ Use first class if exists
+
+    return {
+        name: teacher.fullName,
+        teachSubject: teacher.subjects?.[0]?.subName || "Not Assigned",   // ✅ Use subjects array
+        teachSclass: firstClass?.sclassName || "Not Assigned",             // ✅ Handle safely
+        teachSclassID: firstClass?._id || null,
+        id: teacher._id,
+    };
+});
+
 
     const actions = [
         {
             icon: <PersonAddAlt1Icon color="primary" />, name: 'Add New Teacher',
-            action: () => navigate("/Admin/teachers/chooseclass")
+            action: () => navigate("/Admin/teachers/addteacher/new")
         },
         {
             icon: <PersonRemoveIcon color="error" />, name: 'Delete All Teachers',

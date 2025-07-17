@@ -38,12 +38,22 @@ exports.teacherRegister = async (req, res) => {
       password: hashedPassword,
     };
 
+    // ✅ Validate schoolId
+    // if (!teacherData.schoolId) {
+    //   return res.status(400).json({ error: "schoolId is required" });
+    // }
+
     // Parse nested JSON fields if sent as strings from frontend
     ['emergencyContact', 'salaryBreakup', 'leaveBalance', 'documents'].forEach((field) => {
-      if (teacherData[field] && typeof teacherData[field] === 'string') {
-        teacherData[field] = JSON.parse(teacherData[field]);
-      }
-    });
+  try {
+    if (teacherData[field] && typeof teacherData[field] === 'string') {
+      teacherData[field] = JSON.parse(teacherData[field]);
+    }
+  } catch (err) {
+    console.warn(`Invalid JSON for ${field}, skipping parse.`);
+  }
+});
+
 
     // Parse arrays
     ['subjects', 'classesAssigned'].forEach((field) => {
@@ -68,16 +78,36 @@ exports.teacherRegister = async (req, res) => {
 exports.teacherLogIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const teacher = await Teacher.findOne({ email });
+
+    const teacher = await Teacher.findOne({ email })
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subjectName');
+
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
     const valid = await bcrypt.compare(password, teacher.password);
     if (!valid) return res.status(401).json({ message: "Invalid password" });
-    teacher.password = undefined;
-    res.json(teacher);
+
+    // Return teacher data safely
+    const response = {
+    _id: teacher._id,
+    name: teacher.name,
+    email: teacher.email,
+    role: "Teacher",
+    // school: teacher.schoolId,  // Include schoolId here
+    classesAssigned: teacher.classesAssigned || [],
+    subjects: teacher.subjects || []
+};
+
+
+    res.json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
 
 exports.getTeacherDetail = async (req, res) => {
   try {
@@ -93,14 +123,21 @@ exports.getTeacherDetail = async (req, res) => {
   }
 };
 
+
 exports.getTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().select('-password');
-    res.json(teachers);
+    const teachers = await Teacher.find()
+      .populate('subjects')
+      .populate('classesAssigned');
+
+    res.status(200).json(teachers);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
 
 exports.updateTeacher = async (req, res) => {
   try {
@@ -141,9 +178,61 @@ exports.deleteTeachersByClass = async (req, res) => {
 exports.deleteTeacher = async (req, res) => {
   res.json({ message: "deleteTeacher endpoint hit" });
 };
+
 exports.updateTeacherSubject = async (req, res) => {
-  res.json({ message: "updateTeacherSubject endpoint hit" });
+  try {
+    const { teacherId, subjects } = req.body;
+
+    if (!teacherId || !subjects) {
+      return res.status(400).json({ error: "teacherId and subjects are required" });
+    }
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // If you want to assign multiple subjects, convert subjects to array
+    // For single subject assignment:
+    teacher.subjects = [subjects]; // Replace with the new subject
+
+    await teacher.save();
+
+    res.status(200).json({ message: "Subject assigned to teacher successfully." });
+  } catch (err) {
+    console.error("Update Teacher Subject Error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
 exports.teacherAttendance = async (req, res) => {
   res.json({ message: "teacherAttendance endpoint hit" });
 };
+
+exports.assignTeacherClass = async (req, res) => {
+  try {
+    const { teacherId, classId } = req.body;
+
+    if (!teacherId || !classId) {
+      return res.status(400).json({ error: "teacherId and classId are required." });
+    }
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found." });
+    }
+
+    // Update classesAssigned field
+    teacher.classesAssigned = [classId];
+    await teacher.save();
+
+    res.status(200).json({
+      message: "Class assigned to teacher successfully.",
+      teacher
+    });
+  } catch (err) {
+    console.error("Assign Teacher Class Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+

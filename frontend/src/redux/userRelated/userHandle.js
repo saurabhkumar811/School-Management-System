@@ -20,11 +20,14 @@ export const loginUser = (fields, role) => async (dispatch) => {
         const result = await axios.post(`${REACT_APP_BASE_URL}/${role}Login`, fields, {
             headers: { 'Content-Type': 'application/json' },
         });
-        if (result.data.role) {
-            dispatch(authSuccess(result.data));
-        } else {
-            dispatch(authFailed(result.data.message));
-        }
+        if (result.data.role === role) {   // Match the role
+    dispatch(authSuccess(result.data));
+} else if (result.data.message) {
+    dispatch(authFailed(result.data.message));
+} else {
+    dispatch(authFailed("Unexpected response from server."));
+}
+
     } catch (error) {
         dispatch(authError(error));
     }
