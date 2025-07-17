@@ -35,19 +35,22 @@ const ClassDetails = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const { subjectsList, sclassStudents, sclassDetails, loading, error, response, getresponse } = useSelector((state) => state.sclass);
-
     const classID = params.id
-
     useEffect(() => {
         dispatch(getClassDetails(classID, "Sclass"));
         dispatch(getSubjectList(classID, "ClassSubjects"))
         dispatch(getClassStudents(classID));
     }, [dispatch, classID])
-
+    // ✅ Console student list when it updates
+  useEffect(() => {
+    if (sclassStudents) {
+      console.log("👩‍🎓 Students fetched:", sclassStudents);
+    }
+  }, [sclassStudents]);
     if (error) {
         console.log(error)
     }
-
+    
     const [value, setValue] = useState('1');
     const [showPopup, setShowPopup] = useState(false);
     const [message, setMessage] = useState("");
@@ -118,13 +121,13 @@ const ClassDetails = () => {
     );
 
     const studentColumns = [
-        { id: 'name', label: 'Name', minWidth: 170 },
-        { id: 'rollNum', label: 'Roll Number', minWidth: 100 },
+        { id: 'fullName', label: 'Name', minWidth: 170 },
+        { id: 'rollNumber', label: 'Roll Number', minWidth: 100 },
     ]
 
     const studentRows = sclassStudents.map((student) => ({
-        name: student.name,
-        rollNum: student.rollNum,
+        fullName: student.fullName,
+        rollNumber: student.rollNumber,
         id: student._id,
     }));
 

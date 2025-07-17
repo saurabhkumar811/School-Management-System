@@ -34,6 +34,11 @@ const ViewStudent = () => {
     useEffect(() => {
         dispatch(getUserDetails(studentID, address));
     }, [dispatch, studentID])
+    
+    useEffect(() => {
+  if (userDetails) {
+  }
+}, [userDetails]);
 
     useEffect(() => {
         if (userDetails && userDetails.sclassName && userDetails.sclassName._id !== undefined) {
@@ -81,9 +86,9 @@ const ViewStudent = () => {
 
     useEffect(() => {
         if (userDetails) {
-            setName(userDetails.name || '');
-            setRollNum(userDetails.rollNum || '');
-            setSclassName(userDetails.sclassName || '');
+            setName(userDetails.fullName || '');
+            setRollNum(userDetails.rollNumber || '');
+            setSclassName(userDetails.class || '');
             setStudentSchool(userDetails.school || '');
             setSubjectMarks(userDetails.examResult || '');
             setSubjectAttendance(userDetails.attendance || []);
@@ -342,13 +347,13 @@ const ViewStudent = () => {
     const StudentDetailsSection = () => {
         return (
             <div>
-                Name: {userDetails.name}
+                Name: {userDetails.fullName}
                 <br />
-                Roll Number: {userDetails.rollNum}
+                Roll Number: {userDetails.rollNumber}
                 <br />
                 Class: {sclassName.sclassName}
                 <br />
-                School: {studentSchool.schoolName}
+                {/* School: {studentSchool.schoolName} */}
                 {
                     subjectAttendance && Array.isArray(subjectAttendance) && subjectAttendance.length > 0 && (
                         <CustomPieChart data={chartData} />

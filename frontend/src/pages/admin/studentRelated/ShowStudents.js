@@ -239,7 +239,7 @@ const ShowStudents = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { studentsList, loading, error } = useSelector((state) => state.student);
+  const { students, loading, error } = useSelector((state) => state.student);
   const { currentUser } = useSelector((state) => state.user);
 
   const [classList, setClassList] = useState([]);
@@ -252,6 +252,7 @@ const ShowStudents = () => {
       try {
         const res = await axios.get(`http://localhost:5001/SclassList/${currentUser._id}`);
         setClassList(res.data);
+        console.log(res.data);
       } catch (err) {
         console.error("Failed to load class list", err);
       }
@@ -263,7 +264,6 @@ const ShowStudents = () => {
   useEffect(() => {
     dispatch(getStudents(currentUser._id));
   }, [dispatch, currentUser._id]);
-
   // Filter logic
 //   useEffect(() => {
 //     if (selectedClass && studentsList.length > 0) {
@@ -277,9 +277,9 @@ const ShowStudents = () => {
 //     }
 //   }, [selectedClass, studentsList]);
 useEffect(() => {
-  if (selectedClass && studentsList.length > 0) {
-    const filtered = studentsList.filter((s) => {
-      const studentClassId = s.sclassName?._id?.toString();
+  if (selectedClass && students.length > 0) {
+    const filtered = students.filter((s) => {
+      const studentClassId = s.class?._id?.toString();
       console.log("Student:", s.name);
       console.log("studentClassId:", studentClassId);
       console.log("selectedClass:", selectedClass);
@@ -291,9 +291,9 @@ useEffect(() => {
     setFilteredStudents(filtered);
   } else {
     console.log("No class selected. Showing all students.");
-    setFilteredStudents(studentsList);
+    setFilteredStudents(students);
   }
-}, [selectedClass, studentsList]);
+}, [selectedClass, students]);
 
 
   if (loading) {
@@ -347,9 +347,9 @@ useEffect(() => {
             {filteredStudents.length > 0 ? (
               filteredStudents.map((student) => (
                 <TableRow key={student._id}>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.rollNum}</TableCell>
-                  <TableCell>{student.sclassName?.sclassName || 'N/A'}</TableCell>
+                  <TableCell>{student.fullName}</TableCell>
+                  <TableCell>{student.rollNumber}</TableCell>
+                  <TableCell>{student.class.sclassName}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"

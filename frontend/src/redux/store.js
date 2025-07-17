@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { userReducer } from './userRelated/userSlice';
-import { studentReducer } from './studentRelated/studentSlice';
+import studentReducer from './studentRelated/studentHandle';
 import { noticeReducer } from './noticeRelated/noticeSlice';
 import { sclassReducer } from './sclassRelated/sclassSlice';
 import { teacherReducer } from './teacherRelated/teacherSlice';

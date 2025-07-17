@@ -121,8 +121,9 @@ export const getStudents = (adminId, classId = null) => async (dispatch) => {
     if (classId) {
       url += `?classId=${classId}`;
     }
-
+    
     const res = await axios.get(url);
+    console.log(res.data);
     dispatch({ type: GET_STUDENTS, payload: res.data });
   } catch (error) {
     console.error("Error fetching students:", error);

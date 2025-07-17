@@ -14,21 +14,21 @@ import { getTeachers } from '../../redux/teacherRelated/teacherHandle';
 
 const AdminHomePage = () => {
     const dispatch = useDispatch();
-    const { studentsList } = useSelector((state) => state.student);
+    const { students } = useSelector((state) => state.student);
     const { sclassesList } = useSelector((state) => state.sclass);
     const { teachersList } = useSelector((state) => state.teacher);
 
     const { currentUser } = useSelector(state => state.user)
 
     const adminID = currentUser._id
-
+    console.log("Students : ",students);
     useEffect(() => {
         dispatch(getStudents(adminID));
         dispatch(getAllSclasses(adminID, "Sclass"));
         dispatch(getTeachers(adminID));
     }, [adminID, dispatch]);
 
-    const numberOfStudents = studentsList && studentsList.length;
+    const numberOfStudents = students && students.length;
     const numberOfClasses = sclassesList && sclassesList.length;
     const numberOfTeachers = teachersList && teachersList.length;
 

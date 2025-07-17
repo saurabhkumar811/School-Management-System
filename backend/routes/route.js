@@ -67,7 +67,8 @@ const {
     clearAllStudentsAttendanceBySubject,
     clearAllStudentsAttendance,
     removeStudentAttendanceBySubject,
-    removeStudentAttendance
+    removeStudentAttendance,
+    getStudentCountudentCount
 } = require('../controllers/student_controller.js');
 
 const {
