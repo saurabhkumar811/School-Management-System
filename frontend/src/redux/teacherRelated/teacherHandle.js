@@ -128,3 +128,24 @@ export const assignSubjectToTeacher = ({ teacherId, subjectId }) => async (dispa
     dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
   }
 };
+
+export const removeTeacherClass = ({ teacherId, classId }) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.put(`${REACT_APP_BASE_URL}/RemoveTeacherClass`, { teacherId, classId });
+    dispatch(teacherDetailSuccess(res.data.teacher)); // update teacher detail in state
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};
+
+
+export const removeTeacherSubject = ({ teacherId, subjectId }) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.put(`${REACT_APP_BASE_URL}/RemoveTeacherSubject`, { teacherId, subjectId });
+    dispatch(teacherDetailSuccess(res.data.teacher)); // update teacher detail in state
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};

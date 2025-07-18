@@ -257,3 +257,43 @@ exports.assignTeacherClass = async (req, res) => {
   }
 };
 
+exports.removeTeacherClass = async (req, res) => {
+  try {
+    const { teacherId, classId } = req.body;
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) return res.status(404).json({ error: "Teacher not found." });
+
+    teacher.classesAssigned = teacher.classesAssigned.filter(id => id.toString() !== classId);
+    await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
+
+    res.status(200).json({ message: "Class removed.", teacher: updatedTeacher });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.removeTeacherSubject = async (req, res) => {
+  try {
+    const { teacherId, subjectId } = req.body;
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) return res.status(404).json({ error: "Teacher not found." });
+
+    teacher.subjects = teacher.subjects.filter(id => id.toString() !== subjectId);
+    await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
+
+    res.status(200).json({ message: "Subject removed.", teacher: updatedTeacher });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

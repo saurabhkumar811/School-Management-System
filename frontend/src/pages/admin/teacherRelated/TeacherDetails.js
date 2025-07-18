@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
+import { getTeacherDetail, removeTeacherClass, removeTeacherSubject } from '../../../redux/teacherRelated/teacherHandle';
 import { Button, Container, Typography, Box, List, ListItem } from '@mui/material';
 
 const TeacherDetails = () => {
@@ -27,8 +27,8 @@ const TeacherDetails = () => {
     const assignedSubjects = teacherDetails.subjects || [];
 
     const handleAssignClass = () => {
-    navigate(`/Admin/teachers/chooseclass/${id}`);
-};
+        navigate(`/Admin/teachers/chooseclass/${id}`);
+    };
 
 
     const handleAssignSubject = () => {
@@ -40,6 +40,16 @@ const TeacherDetails = () => {
         navigate(`/Admin/teachers/choosesubject/${assignedClasses[0]._id || 'none'}/${id}`);
 
     };
+
+    const handleRemoveClass = (classId) => {
+        dispatch(removeTeacherClass({ teacherId: id, classId }));
+    };
+
+    const handleRemoveSubject = (subjectId) => {
+        dispatch(removeTeacherSubject({ teacherId: id, subjectId }));
+    };
+
+
 
     return (
         <Container maxWidth="md">
@@ -57,8 +67,16 @@ const TeacherDetails = () => {
                 {assignedClasses.length > 0 ? (
                     <List>
                         {assignedClasses.map((cls) => (
-                            <ListItem key={cls._id}>
+                            <ListItem key={cls._id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 {cls.sclassName}
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleRemoveClass(cls._id)}
+                                >
+                                    Remove
+                                </Button>
                             </ListItem>
                         ))}
                     </List>
@@ -75,8 +93,16 @@ const TeacherDetails = () => {
                 {assignedSubjects.length > 0 ? (
                     <List>
                         {assignedSubjects.map((subj) => (
-                            <ListItem key={subj._id}>
+                            <ListItem key={subj._id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 {subj.subName} ({subj.subCode})
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleRemoveSubject(subj._id)}
+                                >
+                                    Remove
+                                </Button>
                             </ListItem>
                         ))}
                     </List>

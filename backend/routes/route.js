@@ -93,7 +93,9 @@ const {
     updateTeacherSubject,
     updateTeacher,
     teacherAttendance,
-    assignTeacherClass
+    assignTeacherClass,
+    removeTeacherClass,
+    removeTeacherSubject
 } = require('../controllers/teacher-controller.js');
 
 // Admin
@@ -143,6 +145,9 @@ router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
 router.put("/TeacherSubject", updateTeacherSubject);
 router.put('/TeacherAssignClass', assignTeacherClass);
+router.put('/RemoveTeacherClass', removeTeacherClass);
+router.put('/RemoveTeacherSubject', removeTeacherSubject);
+
 
 router.put(
   '/Teacher/:id',
