@@ -175,8 +175,28 @@ exports.deleteTeachers = async (req, res) => {
 exports.deleteTeachersByClass = async (req, res) => {
   res.json({ message: "deleteTeachersByClass endpoint hit" });
 };
+// exports.deleteTeacher = async (req, res) => {
+//   res.json({ message: "deleteTeacher endpoint hit" });
+// };
 exports.deleteTeacher = async (req, res) => {
-  res.json({ message: "deleteTeacher endpoint hit" });
+  try {
+    const teacherId = req.params.id;
+
+    if (!teacherId) {
+      return res.status(400).json({ message: "Teacher ID is required" });
+    }
+
+    const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
+
+    if (!deletedTeacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    res.status(200).json({ message: "Teacher deleted successfully" });
+  } catch (err) {
+    console.error("Delete Teacher Error:", err);
+    res.status(500).json({ error: "Failed to delete teacher" });
+  }
 };
 
 exports.updateTeacherSubject = async (req, res) => {
