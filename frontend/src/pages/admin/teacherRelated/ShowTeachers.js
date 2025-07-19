@@ -44,15 +44,31 @@ const ShowTeachers = () => {
         console.log(error);
     }
 
-    const deleteHandler = (deleteID, address) => {
+    // const deleteHandler = (deleteID, address) => {
+    //     console.log(deleteID);
+    //     console.log(address);
+    //     setMessage("Sorry the delete function has been disabled for now.")
+    //     setShowPopup(true)
+
+    //     // dispatch(deleteUser(deleteID, address)).then(() => {
+    //     //     dispatch(getAllTeachers(currentUser._id));
+    //     // });
+    // };
+const deleteHandler = (deleteID, address) => {
         console.log(deleteID);
         console.log(address);
-        setMessage("Sorry the delete function has been disabled for now.")
-        setShowPopup(true)
-
-        // dispatch(deleteUser(deleteID, address)).then(() => {
-        //     dispatch(getAllTeachers(currentUser._id));
-        // });
+        if (window.confirm("Are you sure you want to delete this teacher?")) {
+    dispatch(deleteUser(deleteID, address))
+      .then(() => {
+        dispatch(getTeachers(currentUser._id));
+        setMessage("Teacher deleted successfully.");
+        setShowPopup(true);
+      })
+      .catch(() => {
+        setMessage("Failed to delete teacher.");
+        setShowPopup(true);
+      });
+  }
     };
 
     const columns = [
