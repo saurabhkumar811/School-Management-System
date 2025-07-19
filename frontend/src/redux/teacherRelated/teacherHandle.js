@@ -171,4 +171,7 @@ export const deleteTeachers = (teacherIds) => async (dispatch) => {
         dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
     }
 };
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
