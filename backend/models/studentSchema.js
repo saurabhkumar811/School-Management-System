@@ -63,6 +63,7 @@ const attendanceMonthSchema = new mongoose.Schema({
 
 const studentSchema = new mongoose.Schema({
   admissionNumber: { type: String, unique: true, required: true },
+  roll: { type: String, unique: true, required: true },          // roll/login field for authentication (NEW)
   fullName: { type: String, required: true },
   dob: Date,
   gender: String,
@@ -71,7 +72,7 @@ const studentSchema = new mongoose.Schema({
   nationality: String,
   religion: String,
   mobile: String,
-  email: { type: String, unique: true },
+  email: { type: String, unique: true, sparse: true },           // keep email but make it optional
   address: String,
   city: String,
   state: String,
@@ -79,7 +80,6 @@ const studentSchema = new mongoose.Schema({
   parentDetails: parentSchema,
   class: { type: mongoose.Schema.Types.ObjectId, ref: 'sclass' },
   section: String,
-  rollNumber: Number,
   academicYear: String,
   admissionDate: Date,
   admissionMode: String,
@@ -97,8 +97,8 @@ const studentSchema = new mongoose.Schema({
   marks: [marksSchema],
   documents: documentUploadsSchema,
   health: healthSchema,
-  username: String,
-  password: String,
+  // username: String,   // (No need - use roll for login)
+  password: { type: String, required: true },                    // password required!
   lastLogin: Date,
   activityLogs: [{ date: Date, activity: String }]
 }, { timestamps: true });

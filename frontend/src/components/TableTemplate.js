@@ -3,8 +3,11 @@ import { StyledTableCell, StyledTableRow } from './styles';
 import { Table, TableBody, TableContainer, TableHead, TablePagination } from '@mui/material';
 
 const TableTemplate = ({ buttonHaver: ButtonHaver, columns, rows }) => {
+    // Always ensure rows is an array
+    const safeRows = Array.isArray(rows) ? rows : [];
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+
     return (
         <>
             <TableContainer>
@@ -26,7 +29,7 @@ const TableTemplate = ({ buttonHaver: ButtonHaver, columns, rows }) => {
                         </StyledTableRow>
                     </TableHead>
                     <TableBody>
-                        {rows
+                        {safeRows
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row) => {
                                 return (
@@ -55,7 +58,7 @@ const TableTemplate = ({ buttonHaver: ButtonHaver, columns, rows }) => {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={rows.length}
+                count={safeRows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={(event, newPage) => setPage(newPage)}

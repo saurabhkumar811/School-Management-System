@@ -129,6 +129,7 @@ export const assignSubjectToTeacher = ({ teacherId, subjectId }) => async (dispa
   }
 };
 
+
 export const removeTeacherClass = ({ teacherId, classId }) => async (dispatch) => {
   dispatch(teacherRequestStart());
   try {
@@ -149,3 +150,25 @@ export const removeTeacherSubject = ({ teacherId, subjectId }) => async (dispatc
     dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
   }
 };
+
+
+export const deleteTeacher = (teacherId) => async (dispatch) => {
+    dispatch(teacherRequestStart());
+    try {
+        await axios.delete(`${REACT_APP_BASE_URL}/Teacher/${teacherId}`);
+        dispatch(getTeachers());  // Optionally refresh teachers list here
+    } catch (error) {
+        dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+    }
+};
+
+export const deleteTeachers = (teacherIds) => async (dispatch) => {
+    dispatch(teacherRequestStart());
+    try {
+        await axios.delete(`${REACT_APP_BASE_URL}/Teachers`, { data: { teacherIds } });
+        dispatch(getTeachers());
+    } catch (error) {
+        dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+    }
+};
+

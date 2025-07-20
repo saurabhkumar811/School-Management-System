@@ -12,7 +12,6 @@ const teacherStorage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
-
 const teacherUpload = multer({ storage: teacherStorage });
 
 // === STUDENT UPLOAD SETUP ===
@@ -24,35 +23,41 @@ const studentStorage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
-
 const studentUpload = multer({ storage: studentStorage });
 
+// ===== CONTROLLERS =====
 
+// ---- Admin
 const {
-    adminRegister,
-    adminLogIn,
-    getAdminDetail
+  adminRegister,
+  adminLogIn,
+  getAdminDetail
 } = require('../controllers/admin-controller.js');
 
+// ---- Sclass
 const {
-    sclassCreate,
-    sclassList,
-    deleteSclass,
-    deleteSclasses,
-    getSclassDetail,
-    getSclassStudents
+  sclassCreate,
+  sclassList,
+  deleteSclass,
+  deleteSclasses,
+  getSclassDetail,
+  getSclassStudents
 } = require('../controllers/class-controller.js');
 
+// ---- Complain
 const { complainCreate, complainList } = require('../controllers/complain-controller.js');
 
+// ---- Notice
 const {
-    noticeCreate,
-    noticeList,
-    deleteNotices,
-    deleteNotice,
-    updateNotice
+  noticeCreate,
+  noticeList,
+  deleteNotices,
+  deleteNotice,
+  updateNotice
 } = require('../controllers/notice-controller.js');
 
+// ---- Student ---
+// USE THE ACTUAL FILENAME of your edited student controller below:
 const {
     studentRegister,
     studentLogIn,
@@ -68,21 +73,24 @@ const {
     clearAllStudentsAttendance,
     removeStudentAttendanceBySubject,
     removeStudentAttendance,
-    getStudentCountudentCount
+    getStudentCount
 } = require('../controllers/student_controller.js');
 
+// ---- Subject
 const {
-    subjectCreate,
-    classSubjects,
-    deleteSubjectsByClass,
-    getSubjectDetail,
-    deleteSubject,
-    freeSubjectList,
-    allSubjects,
-    deleteSubjects
+  subjectCreate,
+  classSubjects,
+  deleteSubjectsByClass,
+  getSubjectDetail,
+  deleteSubject,
+  freeSubjectList,
+  allSubjects,
+  deleteSubjects
 } = require('../controllers/subject-controller.js');
 
+// ---- Teacher
 const {
+
     teacherRegister,
     teacherLogIn,
     getTeachers,
@@ -96,7 +104,10 @@ const {
     assignTeacherClass,
     removeTeacherClass,
     removeTeacherSubject
+
 } = require('../controllers/teacher-controller.js');
+
+// ========== ROUTES ==========
 
 // Admin
 router.post('/AdminReg', adminRegister);
@@ -120,8 +131,6 @@ router.put('/RemoveStudentSubAtten/:id', removeStudentAttendanceBySubject);
 router.put('/RemoveStudentAtten/:id', removeStudentAttendance);
 
 // Teacher
-// Teacher Routes
-
 router.post(
   '/TeacherReg',
   teacherUpload.fields([
@@ -135,7 +144,6 @@ router.post(
   ]),
   teacherRegister
 );
-
 router.post('/TeacherLogin', teacherLogIn);
 router.get("/Teachers/:id", getTeachers);
 router.get("/Teachers", getTeachers);
@@ -145,9 +153,9 @@ router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
 router.put("/TeacherSubject", updateTeacherSubject);
 router.put('/TeacherAssignClass', assignTeacherClass);
+
 router.put('/RemoveTeacherClass', removeTeacherClass);
 router.put('/RemoveTeacherSubject', removeTeacherSubject);
-
 
 router.put(
   '/Teacher/:id',
@@ -162,7 +170,6 @@ router.put(
   ]),
   updateTeacher
 );
-
 router.post('/TeacherAttendance/:id', teacherAttendance);
 
 // Notice

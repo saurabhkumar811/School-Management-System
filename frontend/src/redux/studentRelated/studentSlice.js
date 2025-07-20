@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     studentsList: [],
-    totalStudents: 0, // ✅ Added this line
+    totalStudents: 0,
     loading: false,
     error: null,
     response: null,
@@ -23,8 +23,8 @@ const studentSlice = createSlice({
             state.statestatus = "added";
         },
         getSuccess: (state, action) => {
-            state.studentsList = action.payload.students; // ✅ Use payload.students
-            state.totalStudents = action.payload.total;   // ✅ Set total count
+            state.studentsList = action.payload.students;
+            state.totalStudents = action.payload.total;
             state.loading = false;
             state.error = null;
             state.response = null;

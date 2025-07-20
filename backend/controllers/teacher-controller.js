@@ -170,14 +170,59 @@ exports.updateTeacher = async (req, res) => {
 };
 
 exports.deleteTeachers = async (req, res) => {
-  res.json({ message: "deleteTeachers endpoint hit" });
+  try {
+    const { teacherIds } = req.body;
+
+    if (!teacherIds || !Array.isArray(teacherIds)) {
+      return res.status(400).json({ error: "teacherIds array is required." });
+    }
+
+    const result = await Teacher.deleteMany({ _id: { $in: teacherIds } });
+
+    res.status(200).json({
+      message: "Teachers deleted successfully.",
+      deletedCount: result.deletedCount
+    });
+  } catch (err) {
+    console.error("Delete Teachers Error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
 exports.deleteTeachersByClass = async (req, res) => {
-  res.json({ message: "deleteTeachersByClass endpoint hit" });
+  try {
+    const { classId } = req.params;
+
+    const result = await Teacher.deleteMany({ classesAssigned: classId });
+
+    res.status(200).json({
+      message: `Teachers assigned to class ${classId} deleted successfully.`,
+      deletedCount: result.deletedCount
+    });
+  } catch (err) {
+    console.error("Delete Teachers By Class Error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
+
 exports.deleteTeacher = async (req, res) => {
-  res.json({ message: "deleteTeacher endpoint hit" });
+  try {
+    const { id } = req.params;
+
+    const teacher = await Teacher.findByIdAndDelete(id);
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found." });
+    }
+
+    res.status(200).json({ message: "Teacher deleted successfully.", teacher });
+  } catch (err) {
+    console.error("Delete Teacher Error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
 
 exports.updateTeacherSubject = async (req, res) => {
   try {

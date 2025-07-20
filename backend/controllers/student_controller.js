@@ -1,6 +1,8 @@
 const Student = require('../models/studentSchema.js');
 const bcrypt = require('bcrypt');
 const Sclass = require('../models/sclassSchema.js');
+
+// Student Registration
 exports.studentRegister = async (req, res) => {
   try {
     console.log("📥 Incoming Form Data:", req.body);
@@ -9,16 +11,15 @@ exports.studentRegister = async (req, res) => {
       req.body.parentDetails = JSON.parse(req.body.parentDetails);
     }
 
-    // ✅ Validate classId belongs to admin
     const classDoc = await Sclass.findById(req.body.class);
     if (!classDoc) {
       return res.status(400).json({ message: "Invalid class ID" });
     }
 
-    // 🧠 Optional: Check if this admin is allowed to register into this class
-    // if (classDoc.school.toString() !== req.user._id.toString()) {
-    //   return res.status(403).json({ message: "Unauthorized class assignment" });
-    // }
+    // Hash the password before saving!
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    }
 
     const studentData = {
       ...req.body,
@@ -29,6 +30,8 @@ exports.studentRegister = async (req, res) => {
     await student.save();
 
     console.log("✅ Student registered successfully");
+    // Never send password back
+    student.password = undefined;
     res.status(201).json({ message: "Student registered successfully", student });
 
   } catch (err) {
@@ -41,12 +44,12 @@ exports.studentRegister = async (req, res) => {
   }
 };
 
-
-
+// Student Login using roll and password (matching frontend)
 exports.studentLogIn = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const student = await Student.findOne({ email });
+    const { roll, password } = req.body; // Use 'roll' (or 'rollNumber') field
+    // Adjust field name as per studentSchema.js (replace 'roll' with 'rollNumber' if different)
+    const student = await Student.findOne({ roll }); 
     if (!student) return res.status(404).json({ message: "Student not found" });
     const valid = await bcrypt.compare(password, student.password);
     if (!valid) return res.status(401).json({ message: "Invalid password" });
@@ -70,14 +73,6 @@ exports.getStudentDetail = async (req, res) => {
   }
 };
 
-// exports.getStudents = async (req, res) => {
-//   try {
-//     const students = await Student.find().select('-password');
-//     res.json(students);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 exports.getStudents = async (req, res) => {
   const adminId = req.params.id;
   const {classId} = req.query;
