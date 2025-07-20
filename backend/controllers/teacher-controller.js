@@ -241,7 +241,7 @@ exports.updateTeacherSubject = async (req, res) => {
     const subjectsToAdd = Array.isArray(subjects) ? subjects : [subjects];
 
     subjectsToAdd.forEach(sub => {
-      if (!teacher.subjects.includes(sub)) {
+      if (!teacher.subjects.some(s => s.equals(sub))) {
         teacher.subjects.push(sub);
       }
     });
@@ -282,7 +282,7 @@ exports.assignTeacherClass = async (req, res) => {
 
     // Update classesAssigned field
     // teacher.classesAssigned = [classId];
-    if (!teacher.classesAssigned.includes(classId)) {
+    if (!teacher.classesAssigned.some(c => c.equals(classId))) {
       teacher.classesAssigned.push(classId);
     }
 
