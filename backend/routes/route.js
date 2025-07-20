@@ -90,21 +90,17 @@ const {
 
 // ---- Teacher
 const {
-
-    teacherRegister,
-    teacherLogIn,
-    getTeachers,
-    getTeacherDetail,
-    deleteTeachers,
-    deleteTeachersByClass,
-    deleteTeacher,
-    updateTeacherSubject,
-    updateTeacher,
-    teacherAttendance,
-    assignTeacherClass,
-    removeTeacherClass,
-    removeTeacherSubject
-
+  teacherRegister,
+  teacherLogIn,
+  getTeachers,
+  getTeacherDetail,
+  deleteTeachers,
+  deleteTeachersByClass,
+  deleteTeacher,
+  updateTeacherSubject,
+  updateTeacher,
+  teacherAttendance,
+  assignTeacherClass
 } = require('../controllers/teacher-controller.js');
 
 // ========== ROUTES ==========
@@ -153,10 +149,6 @@ router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
 router.put("/TeacherSubject", updateTeacherSubject);
 router.put('/TeacherAssignClass', assignTeacherClass);
-
-router.put('/RemoveTeacherClass', removeTeacherClass);
-router.put('/RemoveTeacherSubject', removeTeacherSubject);
-
 router.put(
   '/Teacher/:id',
   teacherUpload.fields([

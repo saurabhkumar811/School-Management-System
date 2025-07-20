@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getTeacherDetail, removeTeacherClass, removeTeacherSubject } from '../../../redux/teacherRelated/teacherHandle';
-import { Button, Container, Typography, Box, List, ListItem } from '@mui/material';
+import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
+import { Button, Container, Typography, Box } from '@mui/material';
 
 const TeacherDetails = () => {
     const dispatch = useDispatch();
@@ -21,35 +21,22 @@ const TeacherDetails = () => {
         return <div>Loading teacher details...</div>;
     }
 
-    // const assignedClass = teacherDetails?.classAssigned?.[0];
-    const assignedClasses = teacherDetails.classesAssigned || [];
-    // const assignedSubject = teacherDetails?.teachSubject;
-    const assignedSubjects = teacherDetails.subjects || [];
+    const assignedClass = teacherDetails?.classesAssigned?.[0];
+    const assignedSubject = teacherDetails?.teachSubject;
 
     const handleAssignClass = () => {
-        navigate(`/Admin/teachers/chooseclass/${id}`);
-    };
+    navigate(`/Admin/teachers/chooseclass/${id}`);
+};
 
 
     const handleAssignSubject = () => {
-        // if (!assignedClass) {
-        //     alert("Please assign a class before assigning a subject.");
-        //     return;
-        // }
-        // navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
-        navigate(`/Admin/teachers/choosesubject/${assignedClasses[0]._id || 'none'}/${id}`);
+        if (!assignedClass) {
+            alert("Please assign a class before assigning a subject.");
+            return;
+        }
+        navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
 
     };
-
-    const handleRemoveClass = (classId) => {
-        dispatch(removeTeacherClass({ teacherId: id, classId }));
-    };
-
-    const handleRemoveSubject = (subjectId) => {
-        dispatch(removeTeacherSubject({ teacherId: id, subjectId }));
-    };
-
-
 
     return (
         <Container maxWidth="md">
@@ -63,57 +50,30 @@ const TeacherDetails = () => {
             </Box>
 
             <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Assigned Classes</Typography>
-                {assignedClasses.length > 0 ? (
-                    <List>
-                        {assignedClasses.map((cls) => (
-                            <ListItem key={cls._id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                {cls.sclassName}
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => handleRemoveClass(cls._id)}
-                                >
-                                    Remove
-                                </Button>
-                            </ListItem>
-                        ))}
-                    </List>
+                <Typography variant="h5">Class Assignment</Typography>
+                {assignedClass ? (
+                    <Typography sx={{ mt: 1 }}>
+                        Assigned Class: <strong>{assignedClass.sclassName}</strong>
+                    </Typography>
                 ) : (
-                    <Typography>No classes assigned yet.</Typography>
+                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
+                        Assign Class
+                    </Button>
                 )}
-                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
-                    Assign More Class
-                </Button>
             </Box>
 
             <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Assigned Subjects</Typography>
-                {assignedSubjects.length > 0 ? (
-                    <List>
-                        {assignedSubjects.map((subj) => (
-                            <ListItem key={subj._id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                {subj.subName} ({subj.subCode})
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => handleRemoveSubject(subj._id)}
-                                >
-                                    Remove
-                                </Button>
-                            </ListItem>
-                        ))}
-                    </List>
+                <Typography variant="h5">Subject Assignment</Typography>
+                {assignedSubject?.subName ? (
+                    <Typography sx={{ mt: 1 }}>
+                        Assigned Subject: <strong>{assignedSubject.subName}</strong>
+                    </Typography>
                 ) : (
-                    <Typography>No subjects assigned yet.</Typography>
+                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
+                        Assign Subject
+                    </Button>
                 )}
-                <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
-                    Assign More Subject
-                </Button>
             </Box>
-
         </Container>
     );
 };
