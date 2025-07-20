@@ -151,6 +151,7 @@ export const removeTeacherSubject = ({ teacherId, subjectId }) => async (dispatc
   }
 };
 
+
 export const deleteTeacher = (teacherId) => async (dispatch) => {
     dispatch(teacherRequestStart());
     try {
@@ -170,3 +171,4 @@ export const deleteTeachers = (teacherIds) => async (dispatch) => {
         dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
     }
 };
+

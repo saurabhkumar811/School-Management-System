@@ -45,14 +45,14 @@ exports.teacherRegister = async (req, res) => {
 
     // Parse nested JSON fields if sent as strings from frontend
     ['emergencyContact', 'salaryBreakup', 'leaveBalance', 'documents'].forEach((field) => {
-  try {
-    if (teacherData[field] && typeof teacherData[field] === 'string') {
-      teacherData[field] = JSON.parse(teacherData[field]);
-    }
-  } catch (err) {
-    console.warn(`Invalid JSON for ${field}, skipping parse.`);
-  }
-});
+      try {
+        if (teacherData[field] && typeof teacherData[field] === 'string') {
+          teacherData[field] = JSON.parse(teacherData[field]);
+        }
+      } catch (err) {
+        console.warn(`Invalid JSON for ${field}, skipping parse.`);
+      }
+    });
 
 
     // Parse arrays
@@ -90,14 +90,14 @@ exports.teacherLogIn = async (req, res) => {
 
     // Return teacher data safely
     const response = {
-    _id: teacher._id,
-    name: teacher.name,
-    email: teacher.email,
-    role: "Teacher",
-    // school: teacher.schoolId,  // Include schoolId here
-    classesAssigned: teacher.classesAssigned || [],
-    subjects: teacher.subjects || []
-};
+      _id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      role: "Teacher",
+      // school: teacher.schoolId,  // Include schoolId here
+      classesAssigned: teacher.classesAssigned || [],
+      subjects: teacher.subjects || []
+    };
 
 
     res.json(response);
@@ -237,13 +237,26 @@ exports.updateTeacherSubject = async (req, res) => {
       return res.status(404).json({ error: "Teacher not found" });
     }
 
-    // If you want to assign multiple subjects, convert subjects to array
-    // For single subject assignment:
-    teacher.subjects = [subjects]; // Replace with the new subject
+    // multiple subject assignment
+    const subjectsToAdd = Array.isArray(subjects) ? subjects : [subjects];
+
+    subjectsToAdd.forEach(sub => {
+      if (!teacher.subjects.includes(sub)) {
+        teacher.subjects.push(sub);
+      }
+    });
+
 
     await teacher.save();
 
-    res.status(200).json({ message: "Subject assigned to teacher successfully." });
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
+
+    res.status(200).json({ 
+      message: "Subject assigned to teacher successfully.",
+      teacher: updatedTeacher
+    });
   } catch (err) {
     console.error("Update Teacher Subject Error:", err);
     res.status(500).json({ error: err.message });
@@ -268,15 +281,63 @@ exports.assignTeacherClass = async (req, res) => {
     }
 
     // Update classesAssigned field
-    teacher.classesAssigned = [classId];
+    // teacher.classesAssigned = [classId];
+    if (!teacher.classesAssigned.includes(classId)) {
+      teacher.classesAssigned.push(classId);
+    }
+
     await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
 
     res.status(200).json({
       message: "Class assigned to teacher successfully.",
-      teacher
+      teacher: updatedTeacher
     });
   } catch (err) {
     console.error("Assign Teacher Class Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.removeTeacherClass = async (req, res) => {
+  try {
+    const { teacherId, classId } = req.body;
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) return res.status(404).json({ error: "Teacher not found." });
+
+    teacher.classesAssigned = teacher.classesAssigned.filter(id => id.toString() !== classId);
+    await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
+
+    res.status(200).json({ message: "Class removed.", teacher: updatedTeacher });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.removeTeacherSubject = async (req, res) => {
+  try {
+    const { teacherId, subjectId } = req.body;
+
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) return res.status(404).json({ error: "Teacher not found." });
+
+    teacher.subjects = teacher.subjects.filter(id => id.toString() !== subjectId);
+    await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate('classesAssigned', 'sclassName')
+      .populate('subjects', 'subName subCode');
+
+    res.status(200).json({ message: "Subject removed.", teacher: updatedTeacher });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
