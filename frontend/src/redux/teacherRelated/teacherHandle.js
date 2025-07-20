@@ -128,8 +128,7 @@ export const assignSubjectToTeacher = ({ teacherId, subjectId }) => async (dispa
     dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
   }
 };
-<<<<<<< Updated upstream
-=======
+
 
 export const removeTeacherClass = ({ teacherId, classId }) => async (dispatch) => {
   dispatch(teacherRequestStart());
@@ -171,7 +170,3 @@ export const deleteTeachers = (teacherIds) => async (dispatch) => {
         dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
     }
 };
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
