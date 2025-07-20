@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
-import { getTeachers } from '../../../redux/teacherRelated/teacherHandle';
+import { getTeachers, deleteTeacher, deleteTeachers } from '../../../redux/teacherRelated/teacherHandle';
 import {
     Paper, Table, TableBody, TableContainer,
     TableHead, TablePagination, Button, Box, IconButton,
@@ -17,6 +17,8 @@ import Popup from '../../../components/Popup';
 const ShowTeachers = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [showPopup, setShowPopup] = useState(false);
+    const [message, setMessage] = useState("");
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -27,8 +29,7 @@ const ShowTeachers = () => {
         dispatch(getTeachers(currentUser._id));
     }, [currentUser._id, dispatch]);
 
-    const [showPopup, setShowPopup] = useState(false);
-    const [message, setMessage] = useState("");
+    
 
     if (loading) {
         return <div>Loading...</div>;
@@ -43,6 +44,7 @@ const ShowTeachers = () => {
     } else if (error) {
         console.log(error);
     }
+
 
     // const deleteHandler = (deleteID, address) => {
     //     console.log(deleteID);
@@ -69,6 +71,20 @@ const deleteHandler = (deleteID, address) => {
         setShowPopup(true);
       });
   }
+
+
+    const handleDeleteTeacher = (teacherId) => {
+        dispatch(deleteTeacher(teacherId)).then(() => {
+            dispatch(getTeachers(currentUser._id));
+        });
+    };
+
+    const handleDeleteAllTeachers = () => {
+        const teacherIds = teachersList.map((t) => t._id);
+        dispatch(deleteTeachers(teacherIds)).then(() => {
+            dispatch(getTeachers(currentUser._id));
+        });
+
     };
 
     const columns = [
@@ -97,7 +113,14 @@ const deleteHandler = (deleteID, address) => {
         },
         {
             icon: <PersonRemoveIcon color="error" />, name: 'Delete All Teachers',
-            action: () => deleteHandler(currentUser._id, "Teachers")
+            action: () => {
+                if (teachersList.length === 0) {
+                    setMessage("No teachers to delete.");
+                    setShowPopup(true);
+                } else {
+                    handleDeleteAllTeachers();
+                }
+            }
         },
     ];
 
@@ -152,7 +175,7 @@ const deleteHandler = (deleteID, address) => {
                                             );
                                         })}
                                         <StyledTableCell align="center">
-                                            <IconButton onClick={() => deleteHandler(row.id, "Teacher")}>
+                                            <IconButton onClick={() => handleDeleteTeacher(row.id, "Teacher")}>
                                                 <PersonRemoveIcon color="error" />
                                             </IconButton>
                                             <BlueButton variant="contained"
