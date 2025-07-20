@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
-import { Button, Container, Typography, Box } from '@mui/material';
+import { Button, Container, Typography, Box, List, ListItem } from '@mui/material';
 
 const TeacherDetails = () => {
     const dispatch = useDispatch();
@@ -21,8 +21,8 @@ const TeacherDetails = () => {
         return <div>Loading teacher details...</div>;
     }
 
-    const assignedClass = teacherDetails?.classesAssigned?.[0];
-    const assignedSubject = teacherDetails?.teachSubject;
+    const assignedClasses = teacherDetails.classesAssigned || [];
+    const assignedSubjects = teacherDetails.subjects || [];
 
     const handleAssignClass = () => {
     navigate(`/Admin/teachers/chooseclass/${id}`);
@@ -30,11 +30,11 @@ const TeacherDetails = () => {
 
 
     const handleAssignSubject = () => {
-        if (!assignedClass) {
-            alert("Please assign a class before assigning a subject.");
-            return;
-        }
-        navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
+        // if (!assignedClass) {
+        //     alert("Please assign a class before assigning a subject.");
+        //     return;
+        // }
+        navigate(`/Admin/teachers/choosesubject/${assignedClasses[0]._id || 'none'}/${id}`);
 
     };
 
@@ -50,29 +50,41 @@ const TeacherDetails = () => {
             </Box>
 
             <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Class Assignment</Typography>
-                {assignedClass ? (
-                    <Typography sx={{ mt: 1 }}>
-                        Assigned Class: <strong>{assignedClass.sclassName}</strong>
-                    </Typography>
+                <Typography variant="h5">Assigned Classes</Typography>
+                {assignedClasses.length > 0 ? (
+                    <List>
+                {assignedClasses.map((cls) => (
+                            <ListItem key={cls._id}>
+                                {cls.sclassName}
+                            </ListItem>
+                        ))}
+                    </List>
+                    
                 ) : (
-                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
-                        Assign Class
-                    </Button>
+                    <Typography>No classes assigned yet.</Typography>
                 )}
+                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
+                    Assign More Class
+                </Button>
             </Box>
 
             <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Subject Assignment</Typography>
-                {assignedSubject?.subName ? (
-                    <Typography sx={{ mt: 1 }}>
-                        Assigned Subject: <strong>{assignedSubject.subName}</strong>
-                    </Typography>
+                <Typography variant="h5">Assigned Subjects</Typography>
+                {assignedSubjects.length > 0 ? (
+                    <List>
+                        {assignedSubjects.map((subj) => (
+                            <ListItem key={subj._id}>
+                                {subj.subName} ({subj.subCode})
+                            </ListItem>
+                        ))}
+                    </List>
+                    
                 ) : (
-                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
-                        Assign Subject
-                    </Button>
+                    <Typography>No subjects assigned yet.</Typography>
                 )}
+                <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
+                    Assign More Subject
+                </Button>
             </Box>
         </Container>
     );

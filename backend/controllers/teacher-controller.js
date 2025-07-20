@@ -1,13 +1,13 @@
-const Teacher = require('../models/teacherSchema.js');
-const bcrypt = require('bcrypt');
+const Teacher = require("../models/teacherSchema.js");
+const bcrypt = require("bcrypt");
 
 function mapTeacherFiles(req, teacherData) {
   // Handle single photo and digitalSignature
-  if (req.files && req.files['photo']) {
-    teacherData.photo = req.files['photo'][0].path;
+  if (req.files && req.files["photo"]) {
+    teacherData.photo = req.files["photo"][0].path;
   }
-  if (req.files && req.files['digitalSignature']) {
-    teacherData.digitalSignature = req.files['digitalSignature'][0].path;
+  if (req.files && req.files["digitalSignature"]) {
+    teacherData.digitalSignature = req.files["digitalSignature"][0].path;
   }
 
   // Documents (initialize if not present)
@@ -15,15 +15,18 @@ function mapTeacherFiles(req, teacherData) {
 
   if (req.files) {
     // Single file documents
-    ['resume', 'idProof', 'joiningLetter'].forEach((docField) => {
+    ["resume", "idProof", "joiningLetter"].forEach((docField) => {
       if (req.files[`documents.${docField}`]) {
-        teacherData.documents[docField] = req.files[`documents.${docField}`][0].path;
+        teacherData.documents[docField] =
+          req.files[`documents.${docField}`][0].path;
       }
     });
     // Multiple file documents
-    ['qualificationCertificates', 'experienceLetters'].forEach((docField) => {
+    ["qualificationCertificates", "experienceLetters"].forEach((docField) => {
       if (req.files[`documents.${docField}`]) {
-        teacherData.documents[docField] = req.files[`documents.${docField}`].map(file => file.path);
+        teacherData.documents[docField] = req.files[
+          `documents.${docField}`
+        ].map((file) => file.path);
       }
     });
   }
@@ -44,21 +47,28 @@ exports.teacherRegister = async (req, res) => {
     // }
 
     // Parse nested JSON fields if sent as strings from frontend
-    ['emergencyContact', 'salaryBreakup', 'leaveBalance', 'documents'].forEach((field) => {
-  try {
-    if (teacherData[field] && typeof teacherData[field] === 'string') {
-      teacherData[field] = JSON.parse(teacherData[field]);
-    }
-  } catch (err) {
-    console.warn(`Invalid JSON for ${field}, skipping parse.`);
-  }
-});
-
+    ["emergencyContact", "salaryBreakup", "leaveBalance", "documents"].forEach(
+      (field) => {
+        try {
+          if (teacherData[field] && typeof teacherData[field] === "string") {
+            teacherData[field] = JSON.parse(teacherData[field]);
+          }
+        } catch (err) {
+          console.warn(`Invalid JSON for ${field}, skipping parse.`);
+        }
+      }
+    );
 
     // Parse arrays
-    ['subjects', 'classesAssigned'].forEach((field) => {
-      if (teacherData[field] && typeof teacherData[field] === 'string') {
-        teacherData[field] = JSON.parse(teacherData[field]);
+    ["subjects", "classesAssigned"].forEach((field) => {
+      try {
+        if (teacherData[field] && typeof teacherData[field] === "string") {
+          {
+            teacherData[field] = JSON.parse(teacherData[field]);
+          }
+        }
+      } catch (err) {
+        console.warn(`Invalid JSON for ${field}, skipping parse.`);
       }
     });
 
@@ -80,8 +90,8 @@ exports.teacherLogIn = async (req, res) => {
     const { email, password } = req.body;
 
     const teacher = await Teacher.findOne({ email })
-      .populate('classesAssigned', 'sclassName')
-      .populate('subjects', 'subjectName');
+      .populate("classesAssigned", "sclassName")
+      .populate("subjects", "subjectName");
 
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
 
@@ -90,15 +100,14 @@ exports.teacherLogIn = async (req, res) => {
 
     // Return teacher data safely
     const response = {
-    _id: teacher._id,
-    name: teacher.name,
-    email: teacher.email,
-    role: "Teacher",
-    // school: teacher.schoolId,  // Include schoolId here
-    classesAssigned: teacher.classesAssigned || [],
-    subjects: teacher.subjects || []
-};
-
+      _id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      role: "Teacher",
+      // school: teacher.schoolId,  // Include schoolId here
+      classesAssigned: teacher.classesAssigned || [],
+      subjects: teacher.subjects || [],
+    };
 
     res.json(response);
   } catch (err) {
@@ -106,16 +115,13 @@ exports.teacherLogIn = async (req, res) => {
   }
 };
 
-
-
-
 exports.getTeacherDetail = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id)
-      .populate('subjects')
-      .populate('classesAssigned')
-      .populate('remarksOnStudents.student');
-    if (!teacher) return res.status(404).json({ error: 'Teacher not found' });
+      .populate("subjects")
+      .populate("classesAssigned")
+      .populate("remarksOnStudents.student");
+    if (!teacher) return res.status(404).json({ error: "Teacher not found" });
     teacher.password = undefined;
     res.json(teacher);
   } catch (err) {
@@ -123,21 +129,17 @@ exports.getTeacherDetail = async (req, res) => {
   }
 };
 
-
 exports.getTeachers = async (req, res) => {
   try {
     const teachers = await Teacher.find()
-      .populate('subjects')
-      .populate('classesAssigned');
+      .populate("subjects")
+      .populate("classesAssigned");
 
     res.status(200).json(teachers);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-
-
 
 exports.updateTeacher = async (req, res) => {
   try {
@@ -147,13 +149,15 @@ exports.updateTeacher = async (req, res) => {
     }
 
     // Parse stringified nested fields from frontend
-    ['emergencyContact', 'salaryBreakup', 'leaveBalance', 'documents'].forEach((field) => {
-      if (updateData[field] && typeof updateData[field] === 'string') {
-        updateData[field] = JSON.parse(updateData[field]);
+    ["emergencyContact", "salaryBreakup", "leaveBalance", "documents"].forEach(
+      (field) => {
+        if (updateData[field] && typeof updateData[field] === "string") {
+          updateData[field] = JSON.parse(updateData[field]);
+        }
       }
-    });
-    ['subjects', 'classesAssigned'].forEach((field) => {
-      if (updateData[field] && typeof updateData[field] === 'string') {
+    );
+    ["subjects", "classesAssigned"].forEach((field) => {
+      if (updateData[field] && typeof updateData[field] === "string") {
         updateData[field] = JSON.parse(updateData[field]);
       }
     });
@@ -161,7 +165,9 @@ exports.updateTeacher = async (req, res) => {
     // Map file uploads to updateData
     mapTeacherFiles(req, updateData);
 
-    const teacher = await Teacher.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    const teacher = await Teacher.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
     if (teacher) teacher.password = undefined;
     res.json(teacher);
   } catch (err) {
@@ -204,7 +210,9 @@ exports.updateTeacherSubject = async (req, res) => {
     const { teacherId, subjects } = req.body;
 
     if (!teacherId || !subjects) {
-      return res.status(400).json({ error: "teacherId and subjects are required" });
+      return res
+        .status(400)
+        .json({ error: "teacherId and subjects are required" });
     }
 
     const teacher = await Teacher.findById(teacherId);
@@ -212,13 +220,24 @@ exports.updateTeacherSubject = async (req, res) => {
       return res.status(404).json({ error: "Teacher not found" });
     }
 
-    // If you want to assign multiple subjects, convert subjects to array
-    // For single subject assignment:
-    teacher.subjects = [subjects]; // Replace with the new subject
+    // multiple subject assignment
+    const subjectsToAdd = Array.isArray(subjects) ? subjects : [subjects];
+
+    subjectsToAdd.forEach((sub) => {
+      if (!teacher.subjects.includes(sub)) {
+        teacher.subjects.push(sub);
+      }
+    });
 
     await teacher.save();
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate("classesAssigned", "sclassName")
+      .populate("subjects", "subName subCode");
 
-    res.status(200).json({ message: "Subject assigned to teacher successfully." });
+    res.status(200).json({
+      message: "Subject assigned to teacher successfully.",
+      teacher: updatedTeacher,
+    });
   } catch (err) {
     console.error("Update Teacher Subject Error:", err);
     res.status(500).json({ error: err.message });
@@ -234,7 +253,9 @@ exports.assignTeacherClass = async (req, res) => {
     const { teacherId, classId } = req.body;
 
     if (!teacherId || !classId) {
-      return res.status(400).json({ error: "teacherId and classId are required." });
+      return res
+        .status(400)
+        .json({ error: "teacherId and classId are required." });
     }
 
     const teacher = await Teacher.findById(teacherId);
@@ -243,16 +264,22 @@ exports.assignTeacherClass = async (req, res) => {
     }
 
     // Update classesAssigned field
-    teacher.classesAssigned = [classId];
+    if (!teacher.classesAssigned.includes(classId)) {
+      teacher.classesAssigned.push(classId);
+    }
+
     await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(teacherId)
+      .populate("classesAssigned", "sclassName")
+      .populate("subjects", "subName subCode");
 
     res.status(200).json({
       message: "Class assigned to teacher successfully.",
-      teacher
+      teacher: updatedTeacher,
     });
   } catch (err) {
     console.error("Assign Teacher Class Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
-
