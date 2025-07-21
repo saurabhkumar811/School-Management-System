@@ -101,12 +101,14 @@ exports.teacherLogIn = async (req, res) => {
     // Return teacher data safely
     const response = {
       _id: teacher._id,
-      name: teacher.name,
+      name: teacher.fullName,
       email: teacher.email,
       role: "Teacher",
       // school: teacher.schoolId,  // Include schoolId here
       classesAssigned: teacher.classesAssigned || [],
       subjects: teacher.subjects || [],
+      teachSclass: teacher.classesAssigned[0] || null,
+      teachSubject: teacher.subjects[0] || null,
     };
 
     res.json(response);
