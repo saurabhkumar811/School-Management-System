@@ -95,10 +95,10 @@ const deleteHandler = (deleteID, address) => {
             icon: <PersonAddAlt1Icon color="primary" />, name: 'Add New Teacher',
             action: () => navigate("/Admin/teachers/addteacher/new")
         },
-        {
-            icon: <PersonRemoveIcon color="error" />, name: 'Delete All Teachers',
-            action: () => deleteHandler(currentUser._id, "Teachers")
-        },
+        // {
+        //     icon: <PersonRemoveIcon color="error" />, name: 'Delete All Teachers',
+        //     action: () => deleteHandler(currentUser._id, "Teachers")
+        // },
     ];
 
     return (
