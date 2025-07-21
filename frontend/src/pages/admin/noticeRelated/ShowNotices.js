@@ -88,11 +88,11 @@ const ShowNotices = () => {
                                 <NoteAddIcon />
                             </Fab>
                         </Tooltip>
-                        // <Tooltip title="Delete All Notices">
-                        //     <Fab color="error" size="small" onClick={handleDeleteAll}>
-                        //         <DeleteIcon />
-                        //     </Fab>
-                        // </Tooltip>
+                       /* <Tooltip title="Delete All Notices">
+                            <Fab color="error" size="small" onClick={handleDeleteAll}>
+                                <DeleteIcon />
+                            </Fab>
+                        </Tooltip> */
                     </Box>
                 </Box>
                 {loading ? (
