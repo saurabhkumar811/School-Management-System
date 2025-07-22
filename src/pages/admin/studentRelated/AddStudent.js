@@ -499,9 +499,16 @@ function AddStudent() {
     Object.keys(form).forEach((key) => {
       if (key === "photo" && form[key]) {
         data.append("photo", form[key]);
-      } else if (typeof form[key] === "object") {
-        data.append(key, JSON.stringify(form[key]));
-      } else {
+      } 
+      // else if (typeof form[key] === "object") {
+      //   data.append(key, JSON.stringify(form[key]));
+      // } 
+        else if (key === "parentDetails") {
+  Object.entries(form.parentDetails).forEach(([field, value]) => {
+    data.append(`parentDetails.${field}`, value);
+  });
+}
+      else {
         data.append(key, form[key]);
       }
     });
@@ -532,16 +539,16 @@ function AddStudent() {
       ) : (
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="form-group">
-            <input name="admissionNumber" placeholder="Admission Number" value={form.admissionNumber} onChange={handleChange} required />
-            <input name="fullName" placeholder="Full Name" value={form.fullName} onChange={handleChange} required />
+            <input name="admissionNumber" className="bright-placeholder" placeholder="Admission Number" value={form.admissionNumber} onChange={handleChange} required />
+            <input name="fullName" className="bright-placeholder" placeholder="Full Name" value={form.fullName} onChange={handleChange} required />
             <input name="dob" type="date" value={form.dob} onChange={handleChange} />
-            <input name="gender" placeholder="Gender" value={form.gender} onChange={handleChange} />
+            <input name="gender" className="bright-placeholder" placeholder="Gender" value={form.gender} onChange={handleChange} />
             <input name="photo" type="file" accept="image/*" onChange={handleChange} />
             <input name="bloodGroup" placeholder="Blood Group" value={form.bloodGroup} onChange={handleChange} />
             <input name="nationality" placeholder="Nationality" value={form.nationality} onChange={handleChange} />
             <input name="religion" placeholder="Religion" value={form.religion} onChange={handleChange} />
             <input name="mobile" placeholder="Mobile Number" value={form.mobile} onChange={handleChange} />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+            <input name="email" className="bright-placeholder" placeholder="Email" value={form.email} onChange={handleChange} />
             <input name="address" placeholder="Address" value={form.address} onChange={handleChange} />
             <input name="city" placeholder="City" value={form.city} onChange={handleChange} />
             <input name="state" placeholder="State" value={form.state} onChange={handleChange} />
@@ -572,7 +579,8 @@ function AddStudent() {
               ))}
             </select>
             <input name="section" placeholder="Section" value={form.section} onChange={handleChange} />
-            <input name="rollNumber" placeholder="Roll Number" value={form.rollNumber} onChange={handleChange} />
+            // <input name="rollNumber" placeholder="Roll Number" value={form.rollNumber} onChange={handleChange} />
+            <input name="roll" className="bright-placeholder" placeholder="Roll Number" value={form.roll} onChange={handleChange} />
             <input name="academicYear" placeholder="Academic Year" value={form.academicYear} onChange={handleChange} />
             <input name="admissionDate" type="date" value={form.admissionDate} onChange={handleChange} />
             <input name="admissionMode" placeholder="Admission Mode" value={form.admissionMode} onChange={handleChange} />
@@ -583,7 +591,7 @@ function AddStudent() {
           <h3>Login Credentials</h3>
           <div className="form-group">
             <input name="username" placeholder="Username" value={form.username} onChange={handleChange} />
-            <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} />
+            <input name="password" className="bright-placeholder" type="password" placeholder="Password" value={form.password} onChange={handleChange} />
           </div>
 
           <button type="submit">Add Student</button>
