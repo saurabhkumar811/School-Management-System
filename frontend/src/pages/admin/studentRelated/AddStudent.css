@@ -49,3 +49,8 @@ button:hover {
   border: 1px solid #aaffaa;
   text-align: center;
 }
+.bright-placeholder::placeholder {
+  color: black;          /* Black or any bright color */
+  font-weight: 600;     /* Make it bold */
+  opacity: 1;           /* Full visibility */
+}
