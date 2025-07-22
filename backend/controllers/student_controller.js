@@ -7,9 +7,16 @@ exports.studentRegister = async (req, res) => {
   try {
     console.log("📥 Incoming Form Data:", req.body);
 
-    if (req.body.parentDetails && typeof req.body.parentDetails === "string") {
-      req.body.parentDetails = JSON.parse(req.body.parentDetails);
-    }
+    // if (req.body.parentDetails && typeof req.body.parentDetails === "string") {
+    //   req.body.parentDetails = JSON.parse(req.body.parentDetails);
+    // }
+    const parentDetails = {};
+for (const key in req.body) {
+  if (key.startsWith("parentDetails.")) {
+    const field = key.split(".")[1];
+    parentDetails[field] = req.body[key];
+  }
+}
 
     const classDoc = await Sclass.findById(req.body.class);
     if (!classDoc) {
@@ -21,10 +28,15 @@ exports.studentRegister = async (req, res) => {
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    const studentData = {
-      ...req.body,
-      photo: req.file ? req.file.path.replace(/\\/g, "/") : null
-    };
+    // const studentData = {
+    //   ...req.body,
+    //   photo: req.file ? req.file.path.replace(/\\/g, "/") : null
+    // };
+     const studentData = {
+  ...req.body,
+  parentDetails, // 👈 override the flat parentDetails with nested object
+  photo: req.file ? req.file.path.replace(/\\/g, "/") : null
+};
 
     const student = new Student(studentData);
     await student.save();
