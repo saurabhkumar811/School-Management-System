@@ -579,7 +579,6 @@ function AddStudent() {
               ))}
             </select>
             <input name="section" placeholder="Section" value={form.section} onChange={handleChange} />
-            // <input name="rollNumber" placeholder="Roll Number" value={form.rollNumber} onChange={handleChange} />
             <input name="roll" className="bright-placeholder" placeholder="Roll Number" value={form.roll} onChange={handleChange} />
             <input name="academicYear" placeholder="Academic Year" value={form.academicYear} onChange={handleChange} />
             <input name="admissionDate" type="date" value={form.admissionDate} onChange={handleChange} />
