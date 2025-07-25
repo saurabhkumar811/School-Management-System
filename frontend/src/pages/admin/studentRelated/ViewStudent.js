@@ -458,19 +458,207 @@
 //         }
 //     }
 // }
-import React, { useEffect } from 'react';
+// import React, { useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { getUserDetails } from '../../../redux/userRelated/userHandle';
+// import { useParams } from 'react-router-dom';
+// import { Box, Paper, Typography, Grid, Divider, Container } from '@mui/material';
+
+// // Photo box component for fixed-size, circular photo display
+// const PhotoBox = ({ photo }) => {
+//   const backendUrl = "http://localhost:5001"; // Change to your backend base url or env var
+
+//   const src = photo
+//     ? `${backendUrl}/${photo}`              // e.g. http://localhost:5001/uploads/students/filename.jpg
+//     : "/default-avatar.jpg";                // fallback default avatar
+
+//   return (
+//     <Box
+//       sx={{
+//         width: 180,
+//         height: 180,
+//         mb: 2,
+//         mx: "auto",
+//         borderRadius: "50%",
+//         overflow: "hidden",
+//         boxShadow: 3,
+//         backgroundColor: "#f5f5f5",
+//         border: "2px solid #DADADA"
+//       }}
+//     >
+//       <img
+//         src={src}
+//         alt="Student"
+//         style={{
+//           width: "100%",
+//           height: "100%",
+//           objectFit: "cover",
+//         }}
+//       />
+//     </Box>
+//   );
+// };
+
+// const ViewStudent = () => {
+//   const { id } = useParams();
+//   const dispatch = useDispatch();
+//   const { userDetails, loading } = useSelector(state => state.user);
+
+//   // Fetch student details on mount or id change
+//   useEffect(() => {
+//     dispatch(getUserDetails(id, "Student"));
+//   }, [dispatch, id]);
+
+//   if (!userDetails || loading) {
+//     return (
+//       <Box sx={{ p: 4, textAlign: "center" }}>
+//         <Typography variant="h6">Loading...</Typography>
+//       </Box>
+//     );
+//   }
+
+//   // Destructure with safe defaults
+//   const {
+//     fullName = "",
+//     roll = "",
+//     rollNumber = "",
+//     photo = "",
+//     admissionNumber = "",
+//     dob = "",
+//     gender = "",
+//     bloodGroup = "",
+//     nationality = "",
+//     religion = "",
+//     mobile = "",
+//     email = "",
+//     address = "",
+//     city = "",
+//     state = "",
+//     pinCode = "",
+//     parentDetails = {},
+//     class: classObj = {},
+//     section = "",
+//     academicYear = "",
+//     admissionDate = "",
+//     admissionMode = "",
+//     previousSchool = "",
+//     scholarship = "",
+//   } = userDetails;
+
+//   const displayRoll = roll || rollNumber;
+
+//   return (
+//     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+//       <Paper sx={{ p: 4, boxShadow: 4 }}>
+//         {/* Photo and Name */}
+//         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+//           <PhotoBox photo={photo} />
+//           <Typography variant="h4" fontWeight="bold" gutterBottom>
+//             {fullName}
+//           </Typography>
+//           <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+//             Roll No: {displayRoll} | Admission Number: {admissionNumber}
+//           </Typography>
+//         </Box>
+//         <Divider sx={{ my: 2 }} />
+
+//         {/* Personal and Contact Details */}
+//         <Grid container spacing={2}>
+//           <Grid item xs={12} sm={6}>
+//             <Typography variant="h6" fontWeight="bold" gutterBottom>
+//               Personal Details
+//             </Typography>
+//             <Typography><b>Date of Birth:</b> {dob && dob.slice(0, 10)}</Typography>
+//             <Typography><b>Gender:</b> {gender}</Typography>
+//             <Typography><b>Blood Group:</b> {bloodGroup}</Typography>
+//             <Typography><b>Nationality:</b> {nationality}</Typography>
+//             <Typography><b>Religion:</b> {religion}</Typography>
+//           </Grid>
+//           <Grid item xs={12} sm={6}>
+//             <Typography variant="h6" fontWeight="bold" gutterBottom>
+//               Contact Details
+//             </Typography>
+//             <Typography><b>Mobile:</b> {mobile}</Typography>
+//             <Typography><b>Email:</b> {email}</Typography>
+//             <Typography><b>Address:</b> {address}</Typography>
+//             <Typography>
+//               <b>City:</b> {city}, <b>State:</b> {state}, <b>PIN Code:</b> {pinCode}
+//             </Typography>
+//           </Grid>
+//         </Grid>
+//         <Divider sx={{ my: 2 }} />
+
+//         {/* Parent / Guardian Details */}
+//         <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }} gutterBottom>
+//           Parent / Guardian Details
+//         </Typography>
+//         <Grid container spacing={2}>
+//           <Grid item xs={12} sm={6}>
+//             <Typography>
+//               <b>Father Name:</b> {parentDetails.fatherName || "-"}<br />
+//               <b>Occupation:</b> {parentDetails.fatherOccupation || "-"}<br />
+//               <b>Mobile:</b> {parentDetails.fatherMobile || "-"}
+//             </Typography>
+//           </Grid>
+//           <Grid item xs={12} sm={6}>
+//             <Typography>
+//               <b>Mother Name:</b> {parentDetails.motherName || "-"}<br />
+//               <b>Occupation:</b> {parentDetails.motherOccupation || "-"}<br />
+//               <b>Mobile:</b> {parentDetails.motherMobile || "-"}
+//             </Typography>
+//           </Grid>
+//           <Grid item xs={12}>
+//             <Typography>
+//               <b>Guardian Name:</b> {parentDetails.guardianName || "-"}<br />
+//               <b>Relation:</b> {parentDetails.guardianRelation || "-"}<br />
+//               <b>Contact:</b> {parentDetails.guardianContact || "-"}<br />
+//               <b>Address:</b> {parentDetails.guardianAddress || "-"}
+//             </Typography>
+//           </Grid>
+//         </Grid>
+//         <Divider sx={{ my: 2 }} />
+
+//         {/* Academic Details */}
+//         <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }} gutterBottom>
+//           Academic Details
+//         </Typography>
+//         <Grid container spacing={2}>
+//           <Grid item xs={12} sm={6}>
+//             <Typography>
+//               <b>Class:</b> {classObj?.sclassName || classObj?.name || "-"} <br />
+//               <b>Section:</b> {section || "-"}
+//             </Typography>
+//           </Grid>
+//           <Grid item xs={12} sm={6}>
+//             <Typography>
+//               <b>Academic Year:</b> {academicYear || "-"} <br />
+//               <b>Admission Date:</b> {admissionDate && admissionDate.slice(0, 10)} <br />
+//               <b>Admission Mode:</b> {admissionMode || "-"} <br />
+//               <b>Previous School:</b> {previousSchool || "-"} <br />
+//               <b>Scholarship:</b> {scholarship || "-"}
+//             </Typography>
+//           </Grid>
+//         </Grid>
+//       </Paper>
+//     </Container>
+//   );
+// };
+
+// export default ViewStudent;
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserDetails } from '../../../redux/userRelated/userHandle';
-import { useParams } from 'react-router-dom';
-import { Box, Paper, Typography, Grid, Divider, Container } from '@mui/material';
+import { getUserDetails, deleteUser } from '../../../redux/userRelated/userHandle';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Paper, Typography, Grid, Divider, Container, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 
 // Photo box component for fixed-size, circular photo display
 const PhotoBox = ({ photo }) => {
   const backendUrl = "http://localhost:5001"; // Change to your backend base url or env var
-
   const src = photo
-    ? `${backendUrl}/${photo}`              // e.g. http://localhost:5001/uploads/students/filename.jpg
-    : "/default-avatar.jpg";                // fallback default avatar
+    ? `${backendUrl}/${photo}` // e.g. http://localhost:5001/uploads/students/filename.jpg
+    : "/default-avatar.jpg"; // fallback default avatar
 
   return (
     <Box
@@ -502,7 +690,13 @@ const PhotoBox = ({ photo }) => {
 const ViewStudent = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { userDetails, loading } = useSelector(state => state.user);
+
+  // Dialog for delete confirmation
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch student details on mount or id change
   useEffect(() => {
@@ -547,9 +741,56 @@ const ViewStudent = () => {
 
   const displayRoll = roll || rollNumber;
 
+  // Handler for delete button
+  const handleDeleteClick = () => {
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
+    // "Student" is passed as address for endpoint
+    await dispatch(deleteUser(id, "Student"));
+    setDeleteLoading(false);
+    setOpenDeleteDialog(false);
+    // Optionally show a toast/snackbar here
+    navigate('/Admin/students', { replace: true }); // Go back to students list
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleAttendanceClick = () => {
+    // Go to attendance page for this student
+    navigate(`/Admin/students/student/attendance/${id}`);
+  };
+
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 4, boxShadow: 4 }}>
+        {/* Actions Row */}
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mb: 2 }}>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={handleDeleteClick}
+            sx={{ textTransform: 'none' }}
+            disabled={deleteLoading}
+          >
+            Delete Student
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            startIcon={<EventAvailableIcon />}
+            onClick={handleAttendanceClick}
+            sx={{ textTransform: 'none' }}
+          >
+            Add Attendance
+          </Button>
+        </Box>
+
         {/* Photo and Name */}
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <PhotoBox photo={photo} />
@@ -640,9 +881,31 @@ const ViewStudent = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={handleCancelDelete}>
+        <DialogTitle>Delete Student</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete <b>{fullName}</b>? This action cannot be undone!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="inherit">Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? "Deleting..." : "Confirm Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 
 export default ViewStudent;
+
 
