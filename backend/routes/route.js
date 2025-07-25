@@ -197,5 +197,4 @@ router.get("/Subject/:id", getSubjectDetail);
 router.delete("/Subject/:id", deleteSubject);
 router.delete("/Subjects/:id", deleteSubjects);
 router.delete("/SubjectsClass/:id", deleteSubjectsByClass);
-
 module.exports = router;

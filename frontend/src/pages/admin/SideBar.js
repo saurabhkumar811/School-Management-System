@@ -42,22 +42,22 @@ const SideBar = ({ open }) => {
           px: 2.5,
         }}
       >
-        <ListItemIcon
-          sx={{
-            minWidth: 0,
-            mr: open ? 3 : "auto",
-            justifyContent: "center",
-          }}
-        >
-          <Icon color={active(location.pathname) ? "primary" : "inherit"} />
-        </ListItemIcon>
-        <ListItemText
-          primary={label}
-          sx={{
-            opacity: open ? 1 : 0,
-            transition: "opacity 0.2s",
-          }}
-        />
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon color={active(location.pathname) ? "primary" : "inherit"} />
+              </ListItemIcon>
+              <ListItemText
+                primary={label}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  transition: "opacity 0.2s",
+                }}
+              />
       </ListItemButton>
     ));
 

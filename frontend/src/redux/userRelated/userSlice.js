@@ -32,8 +32,8 @@ const userSlice = createSlice({
         authSuccess: (state, action) => {
             state.status = 'success';
             state.currentUser = action.payload;
-            state.currentRole = action.payload.role;
-            localStorage.setItem('user', JSON.stringify(action.payload));
+        state.currentRole = action.payload.role || "Student";
+        localStorage.setItem('user', JSON.stringify({ ...action.payload, role: action.payload.role || "Student" }));
             state.response = null;
             state.error = null;
         },

@@ -20,16 +20,21 @@ export const loginUser = (fields, role) => async (dispatch) => {
         const result = await axios.post(`${REACT_APP_BASE_URL}/${role}Login`, fields, {
             headers: { 'Content-Type': 'application/json' },
         });
-        if (result.data.role === role) {   // Match the role
-    dispatch(authSuccess(result.data));
-} else if (result.data.message) {
-    dispatch(authFailed(result.data.message));
-} else {
-    dispatch(authFailed("Unexpected response from server."));
-}
+
+        // ---- FIX: Branch by response type ----
+        // For Student login, backend returns a student object (with .roll), not "role"
+        if ((role === "Student" && result.data && result.data.roll) ||
+            (role !== "Student" && result.data && result.data.role === role)
+        ) {
+            dispatch(authSuccess(result.data));
+        } else if (result.data && result.data.message) {
+            dispatch(authFailed(result.data.message));
+        } else {
+            dispatch(authFailed("Unexpected response from server."));
+        }
 
     } catch (error) {
-        dispatch(authError(error));
+        dispatch(authError(error?.response?.data?.message || error.message || String(error)));
     }
 };
 
