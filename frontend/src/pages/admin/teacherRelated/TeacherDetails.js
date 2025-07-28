@@ -48,10 +48,63 @@ const TeacherDetails = () => {
                 Teacher Details
             </Typography>
 
-            <Box sx={{ my: 3 }}>
+            {/* <Box sx={{ my: 3 }}>
                 <Typography variant="h6">Name: {teacherDetails.fullName}</Typography>
                 <Typography variant="h6">Email: {teacherDetails.email}</Typography>
-            </Box>
+            </Box> */}
+
+            <Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Personal Details</Typography>
+  <Typography><strong>Employee Code:</strong> {teacherDetails.employeeCode}</Typography>
+  <Typography><strong>Name:</strong> {teacherDetails.fullName}</Typography>
+  <Typography><strong>DOB:</strong> {teacherDetails.dob}</Typography>
+  <Typography><strong>Gender:</strong> {teacherDetails.gender}</Typography>
+  <Typography><strong>Contact Number:</strong> {teacherDetails.contactNumber}</Typography>
+  <Typography><strong>Email:</strong> {teacherDetails.email}</Typography>
+  <Typography><strong>Address:</strong> {teacherDetails.address}</Typography>
+</Box>
+
+<Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Emergency Contact</Typography>
+  <Typography><strong>Name:</strong> {teacherDetails?.emergencyContact?.name}</Typography>
+  <Typography><strong>Relation:</strong> {teacherDetails?.emergencyContact?.relation}</Typography>
+  <Typography><strong>Phone:</strong> {teacherDetails?.emergencyContact?.phone}</Typography>
+</Box>
+
+<Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Bank & Identification</Typography>
+  <Typography><strong>Bank Account Number:</strong> {teacherDetails.bankAccountNumber}</Typography>
+  <Typography><strong>Bank Name:</strong> {teacherDetails.bankName}</Typography>
+  <Typography><strong>IFSC Code:</strong> {teacherDetails.ifscCode}</Typography>
+  <Typography><strong>PAN Number:</strong> {teacherDetails.panNumber}</Typography>
+  <Typography><strong>Aadhar Number:</strong> {teacherDetails.aadharNumber}</Typography>
+</Box>
+
+<Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Job Details</Typography>
+  <Typography><strong>Employment Type:</strong> {teacherDetails.employmentType}</Typography>
+  <Typography><strong>Payment Cycle:</strong> {teacherDetails.paymentCycle}</Typography>
+  <Typography><strong>Payment Mode:</strong> {teacherDetails.paymentMode}</Typography>
+  <Typography><strong>Annual CTC:</strong> ₹{teacherDetails.annualCTC}</Typography>
+  <Typography><strong>Monthly Gross:</strong> ₹{teacherDetails.monthlyGross}</Typography>
+  <Typography><strong>Username:</strong> {teacherDetails.username}</Typography>
+  <Typography><strong>Reporting Authority:</strong> {teacherDetails.reportingAuthority}</Typography>
+</Box>
+
+<Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Professional Profile</Typography>
+  <Typography><strong>Qualification:</strong> {teacherDetails.qualification}</Typography>
+  <Typography><strong>Experience (Years):</strong> {teacherDetails.experienceYears}</Typography>
+  <Typography><strong>Working Days/Month:</strong> {teacherDetails.workingDaysPerMonth}</Typography>
+</Box>
+
+<Box sx={{ my: 3 }}>
+  <Typography variant="h5" gutterBottom>Leave Balance</Typography>
+  <Typography><strong>CL:</strong> {teacherDetails?.leaveBalance?.cl}</Typography>
+  <Typography><strong>SL:</strong> {teacherDetails?.leaveBalance?.sl}</Typography>
+  <Typography><strong>PL:</strong> {teacherDetails?.leaveBalance?.pl}</Typography>
+</Box>
+
 
             <Box sx={{ my: 3 }}>
                 <Typography variant="h5">Assigned Classes</Typography>
