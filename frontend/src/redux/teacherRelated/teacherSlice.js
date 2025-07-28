@@ -16,7 +16,7 @@ const teacherSlice = createSlice({
     state.loading = true;
     state.error = null;
     state.response = null;
-    state.teacherDetails = null; // ✅ clear previous details
+    // state.teacherDetails = null; // ✅ clear previous details
 },
 
     teacherAddSuccess: (state, action) => {
