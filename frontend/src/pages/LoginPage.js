@@ -575,6 +575,7 @@ import { LightPurpleButton } from '../components/buttonStyles';
 import styled from 'styled-components';
 import { loginUser } from '../redux/userRelated/userHandle';
 import Popup from '../components/Popup';
+import { teacherLogin } from '../redux/teacherRelated/teacherHandle'; 
 
 const defaultTheme = createTheme();
 
@@ -631,11 +632,60 @@ console.log("LoginPage: currentRole", currentRole, "status", status, "currentUse
       }
 
       const fields = { email, password }
+
       setLoader(true)
+      console.log(fields,role)
       dispatch(loginUser(fields, role))
     }
   };
+// const handleSubmit = (event) => {
+//   event.preventDefault();
 
+//   if (role === "Student") {
+//     const roll = event.target.roll.value;
+//     const password = event.target.password.value;
+
+//     if (!roll || !password) {
+//       if (!roll) setRollNumberError(true);
+//       if (!password) setPasswordError(true);
+//       return;
+//     }
+//     const fields = { roll, password };
+//     setLoader(true);
+//     dispatch(loginUser(fields, role));  // student login unchanged
+
+//   } else if (role === "Teacher") {
+//     // Use teacherLogin action instead of generic loginUser
+//     const email = event.target.email.value;
+//     const password = event.target.password.value;
+
+//     if (!email || !password) {
+//       if (!email) setEmailError(true);
+//       if (!password) setPasswordError(true);
+//       return;
+//     }
+
+//     setLoader(true);
+//     console.log({ email, password }, role);
+//     dispatch(teacherLogin(email, password));  // CALL teacherLogin here
+
+//   } else {
+//     // Admin login still via generic loginUser
+//     const email = event.target.email.value;
+//     const password = event.target.password.value;
+
+//     if (!email || !password) {
+//       if (!email) setEmailError(true);
+//       if (!password) setPasswordError(true);
+//       return;
+//     }
+
+//     const fields = { email, password };
+//     setLoader(true);
+//     console.log(fields, role);
+//     dispatch(loginUser(fields, role));
+//   }
+// };
   const handleInputChange = (event) => {
     const { name } = event.target;
     if (name === 'email') setEmailError(false);

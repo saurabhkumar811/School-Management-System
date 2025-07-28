@@ -1,81 +1,251 @@
 import React, { useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  Avatar,
+  Grid,
+  Divider,
+  Button,
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getTeacherDetail } from '../../../redux/teacherRelated/teacherHandle';
-import { Button, Container, Typography, Box } from '@mui/material';
+import { getTeacherDetail, removeTeacherClass, removeTeacherSubject } from '../../../redux/teacherRelated/teacherHandle';
 
 const TeacherDetails = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { teacherDetails: d, loading } = useSelector((state) => state.teacher);
+  const BASE_URL = "http://localhost:5001/";
 
-    const { teacherDetails, loading } = useSelector((state) => state.teacher);
+  useEffect(() => {
+    if (id) dispatch(getTeacherDetail(id));
+  }, [dispatch, id]);
 
-    useEffect(() => {
-        if (id) {
-            dispatch(getTeacherDetail(id));
-        }
-    }, [dispatch, id]);
+  if (loading || !d) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        <Typography>Loading teacher details...</Typography>
+      </Box>
+    );
+  }
 
-    if (loading || !teacherDetails) {
-        return <div>Loading teacher details...</div>;
-    }
+  const assignedClass = d?.classesAssigned?.[0];
+  const assignedSubject = d?.teachSubject;
+  const teacherImage = typeof d.photo === 'string' ? BASE_URL + d.photo : d.photo?.url || '';
 
-    const assignedClass = teacherDetails?.classesAssigned?.[0];
-    const assignedSubject = teacherDetails?.teachSubject;
+  const renderFile = (file) =>
+    file && typeof file === 'string' ? (
+      <a href={BASE_URL + file} target="_blank" rel="noopener noreferrer">
+        {file.split('/').pop()}
+      </a>
+    ) : file?.name ? (
+      <span>{file.name}</span>
+    ) : (
+      <span>-</span>
+    );
 
-    const handleAssignClass = () => {
-    navigate(`/Admin/teachers/chooseclass/${id}`);
-};
+  const renderFileList = (arr) =>
+    Array.isArray(arr) && arr.length > 0 ? (
+      arr.map((f, i) => (
+        <div key={i}>
+          {typeof f === 'string' ? (
+            <a href={BASE_URL + f} target="_blank" rel="noopener noreferrer">
+              {f.split('/').pop()}
+            </a>
+          ) : f?.name ? (
+            <span>{f.name}</span>
+          ) : (
+            <span>-</span>
+          )}
+        </div>
+      ))
+    ) : (
+      <span>-</span>
+    );
 
-
-    const handleAssignSubject = () => {
-        if (!assignedClass) {
-            alert("Please assign a class before assigning a subject.");
-            return;
-        }
-        navigate(`/Admin/teachers/choosesubject/${assignedClass._id}/${id}`);
-
+    const handleRemoveClass = (classId) => {
+        dispatch(removeTeacherClass({ teacherId: id, classId }));
+        dispatch(getTeacherDetail(id));
     };
 
-    return (
-        <Container maxWidth="md">
-            <Typography variant="h4" align="center" gutterBottom>
-                Teacher Details
-            </Typography>
+    const handleRemoveSubject = (subjectId) => {
+        dispatch(removeTeacherSubject({ teacherId: id, subjectId }));
+        dispatch(getTeacherDetail(id));
+    };
 
-            <Box sx={{ my: 3 }}>
-                <Typography variant="h6">Name: {teacherDetails.fullName}</Typography>
-                <Typography variant="h6">Email: {teacherDetails.email}</Typography>
-            </Box>
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+      <Paper elevation={4} sx={{ maxWidth: 800, width: '100%', borderRadius: 2, p: 3 }}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button variant="contained" color="error">Delete Teacher</Button>
+          <Button variant="contained" color="primary">Add Attendance</Button>
+        </Box>
 
-            <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Class Assignment</Typography>
-                {assignedClass ? (
-                    <Typography sx={{ mt: 1 }}>
-                        Assigned Class: <strong>{assignedClass.sclassName}</strong>
-                    </Typography>
-                ) : (
-                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleAssignClass}>
-                        Assign Class
-                    </Button>
-                )}
-            </Box>
+        {/* Avatar + Name */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2, mb: 2 }}>
+          <Avatar src={teacherImage} alt={d.fullName} sx={{ width: 100, height: 100, fontSize: 42 }}>
+            {d.fullName && d.fullName[0]}
+          </Avatar>
+          <Typography variant="h5" fontWeight="bold">{d.fullName}</Typography>
+          <Typography variant="caption" color="textSecondary">
+            Employee Code: {d.employeeCode || '-'}
+          </Typography>
+        </Box>
 
-            <Box sx={{ my: 3 }}>
-                <Typography variant="h5">Subject Assignment</Typography>
-                {assignedSubject?.subName ? (
-                    <Typography sx={{ mt: 1 }}>
-                        Assigned Subject: <strong>{assignedSubject.subName}</strong>
-                    </Typography>
-                ) : (
-                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleAssignSubject}>
-                        Assign Subject
-                    </Button>
-                )}
-            </Box>
-        </Container>
-    );
+        {/* Personal & Contact */}
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Personal Details</Typography>
+            <Typography>DOB: {d.dob ? new Date(d.dob).toLocaleDateString() : '-'}</Typography>
+            <Typography>Gender: {d.gender || '-'}</Typography>
+            <Typography>Qualification: {d.qualification || '-'}</Typography>
+            <Typography>Experience: {d.experienceYears || '-'} years</Typography>
+            <Typography>Working Days/Month: {d.workingDaysPerMonth || '-'}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Contact Details</Typography>
+            <Typography>Mobile: {d.contactNumber || '-'}</Typography>
+            <Typography>Email: {d.email || '-'}</Typography>
+            <Typography>Address: {d.address || '-'}</Typography>
+            <Typography>Username: {d.username || '-'}</Typography>
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Emergency */}
+        <Box sx={{ mb: 2 }}>
+          <Typography fontWeight="bold">Emergency Contact</Typography>
+          <Typography>Name: {d.emergencyContact?.name || '-'}</Typography>
+          <Typography>Relation: {d.emergencyContact?.relation || '-'}</Typography>
+          <Typography>Phone: {d.emergencyContact?.phone || '-'}</Typography>
+        </Box>
+
+        {/* Employment & Bank */}
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Employment Info</Typography>
+            <Typography>Type: {d.employmentType || '-'}</Typography>
+            <Typography>Payment Cycle: {d.paymentCycle || '-'}</Typography>
+            <Typography>CTC (Annual): ₹{d.annualCTC || '-'}</Typography>
+            <Typography>Gross (Monthly): ₹{d.monthlyGross || '-'}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Bank Details</Typography>
+            <Typography>Bank Name: {d.bankName || '-'}</Typography>
+            <Typography>Account #: {d.bankAccountNumber || '-'}</Typography>
+            <Typography>IFSC: {d.ifscCode || '-'}</Typography>
+            <Typography>PAN: {d.panNumber || '-'}</Typography>
+            <Typography>Aadhar: {d.aadharNumber || '-'}</Typography>
+          </Grid>
+        </Grid>
+
+        {/* Salary & Leave */}
+        {(d.salaryBreakup || d.leaveBalance) && (
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            {d.salaryBreakup && (
+              <Grid item xs={12} sm={6}>
+                <Typography fontWeight="bold">Salary Breakup</Typography>
+                {Object.entries(d.salaryBreakup).map(([key, value]) => (
+                  <Typography key={key}>{key}: ₹{value || '-'}</Typography>
+                ))}
+              </Grid>
+            )}
+            {d.leaveBalance && (
+              <Grid item xs={12} sm={6}>
+                <Typography fontWeight="bold">Leave Balance</Typography>
+                {Object.entries(d.leaveBalance).map(([key, value]) => (
+                  <Typography key={key}>{key.toUpperCase()}: {value || '-'}</Typography>
+                ))}
+              </Grid>
+            )}
+          </Grid>
+        )}
+
+        {/* Teaching Assignment */}
+<Box sx={{ mb: 2 }}>
+  <Typography fontWeight="bold" mb={1}>Teaching Assignment</Typography>
+
+  {/* Assigned Classes */}
+  <Typography fontWeight="medium">Assigned Classes:</Typography>
+  {d.classesAssigned && d.classesAssigned.length > 0 ? (
+    d.classesAssigned.map((cls) => (
+      <Box key={cls._id} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
+        <Typography>{cls.sclassName}</Typography>
+        <Button
+          size="small"
+          variant="outlined"
+          color="error"
+          onClick={() => handleRemoveClass(cls._id)}
+        >
+          Remove
+        </Button>
+      </Box>
+    ))
+  ) : (
+    <Typography variant="body2" color="textSecondary">No class assigned.</Typography>
+  )}
+  <Button
+    size="small"
+    variant="contained"
+    sx={{ mt: 1 }}
+    onClick={() => navigate(`/Admin/teachers/chooseclass/${id}`)}
+  >
+    Assign Class
+  </Button>
+
+  {/* Assigned Subjects */}
+  <Typography fontWeight="medium" mt={2}>Assigned Subjects:</Typography>
+  {d.subjects && d.subjects.length > 0 ? (
+    d.subjects.map((sub) => (
+      <Box key={sub._id} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
+        <Typography>{sub.subName}</Typography>
+        <Button
+          size="small"
+          variant="outlined"
+          color="error"
+          onClick={() => handleRemoveSubject(sub._id)}
+        >
+          Remove
+        </Button>
+      </Box>
+    ))
+  ) : (
+    <Typography variant="body2" color="textSecondary">No subject assigned.</Typography>
+  )}
+  <Button
+    size="small"
+    variant="contained"
+    color="secondary"
+    sx={{ mt: 1 }}
+    onClick={() => {
+      if (!d.classesAssigned || d.classesAssigned.length === 0) {
+        return alert("Please assign class first");
+      }
+      navigate(`/Admin/teachers/choosesubject/${d.classesAssigned[0]._id}/${id}`);
+    }}
+  >
+    Assign Subject
+  </Button>
+</Box>
+
+
+        {/* Documents */}
+        <Box>
+          <Typography fontWeight="bold" sx={{ mb: 1 }}>Documents</Typography>
+          <Typography>Resume: {renderFile(d.documents?.resume)}</Typography>
+          <Typography>ID Proof: {renderFile(d.documents?.idProof)}</Typography>
+          <Typography>Joining Letter: {renderFile(d.documents?.joiningLetter)}</Typography>
+          <Typography>Digital Signature: {renderFile(d.digitalSignature)}</Typography>
+          <Typography>Qualification Certificates: {renderFileList(d.documents?.qualificationCertificates)}</Typography>
+          <Typography>Experience Letters: {renderFileList(d.documents?.experienceLetters)}</Typography>
+        </Box>
+      </Paper>
+    </Box>
+  );
 };
 
 export default TeacherDetails;
