@@ -14,23 +14,45 @@ import {
 } from './userSlice';
 const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5001";
 export const loginUser = (fields, role) => async (dispatch) => {
-    dispatch(authRequest());
+  dispatch(authRequest());
 
-    try {
-        const result = await axios.post(`${REACT_APP_BASE_URL}/${role}Login`, fields, {
-            headers: { 'Content-Type': 'application/json' },
-        });
-        if (result.data.role === role) {   // Match the role
-    dispatch(authSuccess(result.data));
-} else if (result.data.message) {
-    dispatch(authFailed(result.data.message));
-} else {
-    dispatch(authFailed("Unexpected response from server."));
-}
+  try {
+    // For Teacher role, ensure payload matches backend expectation
+    let payload = fields;
 
-    } catch (error) {
-        dispatch(authError(error));
+    if (role === "Teacher") {
+      // adjust this if your backend expects different param names
+      // Example: if backend expects { email, password }, use fields directly
+      // If not, convert fields accordingly here
+      payload = {
+        email: fields.email,   // assuming your form sends 'email'
+        password: fields.password,
+      };
     }
+
+    const result = await axios.post(`${REACT_APP_BASE_URL}/${role}Login`, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    // Check login success according to role
+    // Student: result.data.roll must exist
+    // Others (Admin, Teacher): result.data.role === role (case-sensitive)
+    if (
+      (role === "Student" && result.data && result.data.roll) ||
+      (role !== "Student" && result.data && result.data.role === role)
+    ) {
+      dispatch(authSuccess(result.data));
+    }
+    else if (result.data && result.data.message) {
+      dispatch(authFailed(result.data.message));
+    }
+    else {
+      dispatch(authFailed("Unexpected response from server."));
+    }
+  }
+  catch (error) {
+    dispatch(authError(error?.response?.data?.message || error.message || String(error)));
+  }
 };
 
 export const registerUser = (fields, role) => async (dispatch) => {

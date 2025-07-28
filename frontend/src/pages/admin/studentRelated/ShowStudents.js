@@ -212,6 +212,329 @@
 // };
 
 // export default ShowStudents;
+// import React, { useEffect, useState } from 'react';
+// import {
+//   Box,
+//   Typography,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   CircularProgress,
+//   MenuItem,
+//   FormControl,
+//   Select,
+//   InputLabel,
+//   Button
+// } from '@mui/material';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { getStudents } from '../../../redux/studentRelated/studentHandle';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+
+// const ShowStudents = () => {
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const { students, loading, error } = useSelector((state) => state.student);
+//   const { currentUser } = useSelector((state) => state.user);
+
+//   const [classList, setClassList] = useState([]);
+//   const [selectedClass, setSelectedClass] = useState('');
+//   const [filteredStudents, setFilteredStudents] = useState([]);
+
+//   // Fetch classes
+//   useEffect(() => {
+//     const fetchClasses = async () => {
+//       try {
+//         const res = await axios.get(`http://localhost:5001/SclassList/${currentUser._id}`);
+//         setClassList(res.data);
+//         console.log(res.data);
+//       } catch (err) {
+//         console.error("Failed to load class list", err);
+//       }
+//     };
+//     fetchClasses();
+//   }, [currentUser._id]);
+
+//   // Fetch students
+//   useEffect(() => {
+//     dispatch(getStudents(currentUser._id));
+//   }, [dispatch, currentUser._id]);
+//   // Filter logic
+// //   useEffect(() => {
+// //     if (selectedClass && studentsList.length > 0) {
+// //       setFilteredStudents(
+// //         studentsList.filter(
+// //         (s) => s.sclassName && s.sclassName._id?.toString() === selectedClass)   
+// //       );
+      
+// //     } else {
+// //       setFilteredStudents(studentsList);
+// //     }
+// //   }, [selectedClass, studentsList]);
+// useEffect(() => {
+//   if (selectedClass && students.length > 0) {
+//     const filtered = students.filter((s) => {
+//       const studentClassId = s.class?._id?.toString();
+//       console.log("Student:", s.name);
+//       console.log("studentClassId:", studentClassId);
+//       console.log("selectedClass:", selectedClass);
+//       return studentClassId === selectedClass;
+//     });
+
+//     console.log("Filtered Students:", filtered);
+
+//     setFilteredStudents(filtered);
+//   } else {
+//     console.log("No class selected. Showing all students.");
+//     setFilteredStudents(students);
+//   }
+// }, [selectedClass, students]);
+
+
+//   if (loading) {
+//     return (
+//       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+//         <CircularProgress />
+//       </Box>
+//     );
+//   }
+
+//   if (error) {
+//     return <Typography color="error">Error: {error}</Typography>;
+//   }
+
+//   return (
+//     <Box sx={{ p: 3 }}>
+//       <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+//         All Students
+//       </Typography>
+
+//       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+//         <FormControl sx={{ minWidth: 200 }}>
+//           <InputLabel id="class-select-label">Filter by Class</InputLabel>
+//           <Select
+//             labelId="class-select-label"
+//             value={selectedClass}
+//             label="Filter by Class"
+//             onChange={(e) => setSelectedClass(e.target.value)}
+//           >
+//             <MenuItem value="">All Classes</MenuItem>
+//             {Array.isArray(classList) && classList.map((sclass) => (
+//               <MenuItem key={sclass._id} value={sclass._id}>
+//                 {sclass.sclassName}
+//               </MenuItem>
+//             ))}
+//           </Select>
+//         </FormControl>
+//       </Box>
+
+//       <TableContainer component={Paper} elevation={3}>
+//         <Table>
+//           <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+//             <TableRow>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Roll Number</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Class</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+//             </TableRow>
+//           </TableHead>
+//           <TableBody>
+//             {filteredStudents.length > 0 ? (
+//               filteredStudents.map((student) => (
+//                 <TableRow key={student._id}>
+//                   <TableCell>{student.fullName}</TableCell>
+//                   <TableCell>{student.rollNumber}</TableCell>
+//                   <TableCell>{student.class.sclassName}</TableCell>
+//                   <TableCell>
+//                     <Button
+//                       variant="contained"
+//                       color="primary"
+//                       onClick={() => navigate(`/Admin/students/student/${student._id}`)}
+//                     >
+//                       View Student
+//                     </Button>
+//                   </TableCell>
+//                 </TableRow>
+//               ))
+//             ) : (
+//               <TableRow>
+//                 <TableCell colSpan={4} align="center">
+//                   No students found.
+//                 </TableCell>
+//               </TableRow>
+//             )}
+//           </TableBody>
+//         </Table>
+//       </TableContainer>
+//     </Box>
+//   );
+// };
+
+// export default ShowStudents;
+// import React, { useEffect, useState } from 'react';
+// import {
+//   Box,
+//   Typography,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   CircularProgress,
+//   MenuItem,
+//   FormControl,
+//   Select,
+//   InputLabel,
+//   Button
+// } from '@mui/material';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { getStudents } from '../../../redux/studentRelated/studentHandle';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+
+// const ShowStudents = () => {
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   // Consistent key from redux slice!
+//   const { studentsList, loading, error } = useSelector((state) => state.student);
+//   const { currentUser } = useSelector((state) => state.user);
+
+//   const [classList, setClassList] = useState([]);
+//   const [selectedClass, setSelectedClass] = useState('');
+//   const [filteredStudents, setFilteredStudents] = useState([]);
+
+//   // Fetch classes for filter dropdown
+//   useEffect(() => {
+//     const fetchClasses = async () => {
+//       try {
+//         const res = await axios.get(`http://localhost:5001/SclassList/${currentUser._id}`);
+//         setClassList(res.data);
+//       } catch (err) {
+//         console.error("Failed to load class list", err);
+//       }
+//     };
+//     if (currentUser && currentUser._id) {
+//       fetchClasses();
+//     }
+//   }, [currentUser]);
+
+//   // Fetch all students (admin-level, so depends on admin _id)
+//   useEffect(() => {
+//     if (currentUser && currentUser._id) {
+//       dispatch(getStudents(currentUser._id));
+//     }
+//   }, [dispatch, currentUser]);
+
+//   // Filter students based on selected class
+//   useEffect(() => {
+//     if (selectedClass && studentsList.length > 0) {
+//       const filtered = studentsList.filter((s) => {
+//         const studentClassId = s.class?._id?.toString();
+//         return studentClassId === selectedClass;
+//       });
+//       setFilteredStudents(filtered);
+//     } else {
+//       setFilteredStudents(studentsList);
+//     }
+//   }, [selectedClass, studentsList]);
+
+//   if (loading) {
+//     return (
+//       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+//         <CircularProgress />
+//       </Box>
+//     );
+//   }
+
+//   if (error) {
+//     return <Typography color="error">Error: {error}</Typography>;
+//   }
+
+//   return (
+//     <Box sx={{ p: 3 }}>
+//       <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+//         All Students
+//       </Typography>
+
+//       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//         {/* Add Student Button */}
+//         <Button
+//           variant="contained"
+//           color="primary"
+//           onClick={() => navigate('/Admin/students/add')}
+//           sx={{ mr: 2 }}
+//         >
+//           Add Student
+//         </Button>
+//         <FormControl sx={{ minWidth: 200 }}>
+//           <InputLabel id="class-select-label">Filter by Class</InputLabel>
+//           <Select
+//             labelId="class-select-label"
+//             value={selectedClass}
+//             label="Filter by Class"
+//             onChange={(e) => setSelectedClass(e.target.value)}
+//           >
+//             <MenuItem value="">All Classes</MenuItem>
+//             {Array.isArray(classList) && classList.map((sclass) => (
+//               <MenuItem key={sclass._id} value={sclass._id}>
+//                 {sclass.sclassName}
+//               </MenuItem>
+//             ))}
+//           </Select>
+//         </FormControl>
+//       </Box>
+
+//       <TableContainer component={Paper} elevation={3}>
+//         <Table>
+//           <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+//             <TableRow>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Roll Number</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Class</TableCell>
+//               <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+//             </TableRow>
+//           </TableHead>
+//           <TableBody>
+//             {filteredStudents.length > 0 ? (
+//               filteredStudents.map((student) => (
+//                 <TableRow key={student._id}>
+//                   <TableCell>{student.fullName}</TableCell>
+//                   <TableCell>{student.roll}</TableCell>
+//                   <TableCell>{student.class?.sclassName || ''}</TableCell>
+//                   <TableCell>
+//                     <Button
+//                       variant="contained"
+//                       color="primary"
+//                       onClick={() => navigate(`/Admin/students/student/${student._id}`)}
+//                     >
+//                       View Student
+//                     </Button>
+//                   </TableCell>
+//                 </TableRow>
+//               ))
+//             ) : (
+//               <TableRow>
+//                 <TableCell colSpan={4} align="center">
+//                   No students found.
+//                 </TableCell>
+//               </TableRow>
+//             )}
+//           </TableBody>
+//         </Table>
+//       </TableContainer>
+//     </Box>
+//   );
+// };
+
+// export default ShowStudents;
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -235,66 +558,54 @@ import { getStudents } from '../../../redux/studentRelated/studentHandle';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// No need to change: this will work in your layout, just as always
 const ShowStudents = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { students, loading, error } = useSelector((state) => state.student);
+  const { studentsList, loading, error } = useSelector((state) => state.student);
   const { currentUser } = useSelector((state) => state.user);
 
   const [classList, setClassList] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [filteredStudents, setFilteredStudents] = useState([]);
 
-  // Fetch classes
+  // Fetch classes for filter dropdown (LOCAL BACKEND ONLY!)
   useEffect(() => {
     const fetchClasses = async () => {
       try {
+        // Stick to localhost:5001 for local dev as you want
         const res = await axios.get(`http://localhost:5001/SclassList/${currentUser._id}`);
         setClassList(res.data);
-        console.log(res.data);
       } catch (err) {
         console.error("Failed to load class list", err);
+        setClassList([]);
       }
     };
-    fetchClasses();
-  }, [currentUser._id]);
+    if (currentUser && currentUser._id) {
+      fetchClasses();
+    }
+  }, [currentUser]);
 
-  // Fetch students
+  // Fetch all students (admin-level, so depends on admin _id)
   useEffect(() => {
-    dispatch(getStudents(currentUser._id));
-  }, [dispatch, currentUser._id]);
-  // Filter logic
-//   useEffect(() => {
-//     if (selectedClass && studentsList.length > 0) {
-//       setFilteredStudents(
-//         studentsList.filter(
-//         (s) => s.sclassName && s.sclassName._id?.toString() === selectedClass)   
-//       );
-      
-//     } else {
-//       setFilteredStudents(studentsList);
-//     }
-//   }, [selectedClass, studentsList]);
-useEffect(() => {
-  if (selectedClass && students.length > 0) {
-    const filtered = students.filter((s) => {
-      const studentClassId = s.class?._id?.toString();
-      console.log("Student:", s.name);
-      console.log("studentClassId:", studentClassId);
-      console.log("selectedClass:", selectedClass);
-      return studentClassId === selectedClass;
-    });
+    if (currentUser && currentUser._id) {
+      dispatch(getStudents(currentUser._id));
+    }
+  }, [dispatch, currentUser]);
 
-    console.log("Filtered Students:", filtered);
-
-    setFilteredStudents(filtered);
-  } else {
-    console.log("No class selected. Showing all students.");
-    setFilteredStudents(students);
-  }
-}, [selectedClass, students]);
-
+  // Filter students based on selected class
+  useEffect(() => {
+    if (selectedClass && studentsList.length > 0) {
+      const filtered = studentsList.filter((s) => {
+        const studentClassId = s.class?._id?.toString();
+        return studentClassId === selectedClass;
+      });
+      setFilteredStudents(filtered);
+    } else {
+      setFilteredStudents(studentsList);
+    }
+  }, [selectedClass, studentsList]);
 
   if (loading) {
     return (
@@ -314,7 +625,15 @@ useEffect(() => {
         All Students
       </Typography>
 
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/Admin/students/add')}
+          sx={{ mr: 2 }}
+        >
+          Add Student
+        </Button>
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel id="class-select-label">Filter by Class</InputLabel>
           <Select
@@ -324,7 +643,7 @@ useEffect(() => {
             onChange={(e) => setSelectedClass(e.target.value)}
           >
             <MenuItem value="">All Classes</MenuItem>
-            {classList.map((sclass) => (
+            {Array.isArray(classList) && classList.map((sclass) => (
               <MenuItem key={sclass._id} value={sclass._id}>
                 {sclass.sclassName}
               </MenuItem>
@@ -348,8 +667,8 @@ useEffect(() => {
               filteredStudents.map((student) => (
                 <TableRow key={student._id}>
                   <TableCell>{student.fullName}</TableCell>
-                  <TableCell>{student.rollNumber}</TableCell>
-                  <TableCell>{student.class.sclassName}</TableCell>
+                  <TableCell>{student.roll}</TableCell>
+                  <TableCell>{student.class?.sclassName || ''}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"

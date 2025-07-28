@@ -64,7 +64,7 @@ const StudentAttendance = ({ situation }) => {
     const submitHandler = (event) => {
         event.preventDefault()
         setLoader(true)
-        dispatch(updateStudentFields(studentID, fields, "StudentAttendance"))
+        dispatch(updateStudentFields({ studentId: studentID, fieldsToUpdate: fields }));
     }
 
     useEffect(() => {
