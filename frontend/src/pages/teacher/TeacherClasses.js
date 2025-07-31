@@ -83,35 +83,13 @@ const TeacherClasses = () => {
               Classes Assigned: <strong>{classesAssigned.length}</strong>
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Subjects Assigned: <strong>{subjectsAssigned.length}</strong>
+              Subjects Qualified: <strong>{subjectsAssigned.length}</strong>
             </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Assigned Subjects
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {subjectsAssigned.length > 0 ? (
-                subjectsAssigned.map((subject, index) => (
-                  <Chip
-                    key={index}
-                    label={subject.subjectName}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                  />
-                ))
-              ) : (
-                <Typography variant="body2" color="textSecondary">
-                  No subjects assigned
-                </Typography>
-              )}
-            </Box>
           </Grid>
         </Grid>
       </Box>
 
-      {/* Detailed Class-Subject Assignments */}
+      {/* Class-Subject Assignments */}
       {classAssignments.length > 0 && (
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" gutterBottom>
