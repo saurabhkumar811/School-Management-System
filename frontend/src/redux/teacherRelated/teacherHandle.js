@@ -87,6 +87,17 @@ export const updateTeacherSubject = (data) => async (dispatch) => {
   }
 };
 
+// ✅ Get Teacher Class-Subject Assignments
+export const getTeacherClassSubjects = (teacherId) => async (dispatch) => {
+  dispatch(teacherRequestStart());
+  try {
+    const res = await axios.get(`${REACT_APP_BASE_URL}/TeacherClassSubjects/${teacherId}`);
+    dispatch(teacherDetailSuccess(res.data));
+  } catch (error) {
+    dispatch(teacherRequestFailure(error.response?.data?.error || error.message));
+  }
+};
+
 // Login 
 export const teacherLogin = (email, password) => async (dispatch) => {
   dispatch(teacherRequestStart());

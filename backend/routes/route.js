@@ -59,21 +59,21 @@ const {
 // ---- Student ---
 // USE THE ACTUAL FILENAME of your edited student controller below:
 const {
-    studentRegister,
-    studentLogIn,
-    getStudents,
-    getStudentDetail,
-    deleteStudents,
-    deleteStudent,
-    updateStudent,
-    studentAttendance,
-    deleteStudentsByClass,
-    updateExamResult,
-    clearAllStudentsAttendanceBySubject,
-    clearAllStudentsAttendance,
-    removeStudentAttendanceBySubject,
-    removeStudentAttendance,
-    getStudentCount
+  studentRegister,
+  studentLogIn,
+  getStudents,
+  getStudentDetail,
+  deleteStudents,
+  deleteStudent,
+  updateStudent,
+  studentAttendance,
+  deleteStudentsByClass,
+  updateExamResult,
+  clearAllStudentsAttendanceBySubject,
+  clearAllStudentsAttendance,
+  removeStudentAttendanceBySubject,
+  removeStudentAttendance,
+  getStudentCount
 } = require('../controllers/student_controller.js');
 
 // ---- Subject
@@ -102,7 +102,9 @@ const {
   teacherAttendance,
   assignTeacherClass,
   removeTeacherClass,
-  removeTeacherSubject
+  removeTeacherSubject,
+  getTeacherClassSubjects,
+  syncTeacherSubjectAssignments
 } = require('../controllers/teacher-controller.js');
 
 // ========== ROUTES ==========
@@ -146,6 +148,8 @@ router.post('/TeacherLogin', teacherLogIn);
 router.get("/Teachers/:id", getTeachers);
 router.get("/Teachers", getTeachers);
 router.get("/Teacher/:id", getTeacherDetail);
+router.get("/TeacherClassSubjects/:teacherId", getTeacherClassSubjects);
+router.post("/SyncTeacherSubjects", syncTeacherSubjectAssignments);
 router.delete("/Teachers/:id", deleteTeachers);
 router.delete("/TeachersClass/:id", deleteTeachersByClass);
 router.delete("/Teacher/:id", deleteTeacher);
