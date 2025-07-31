@@ -222,14 +222,24 @@ exports.updateTeacherSubject = async (req, res) => {
       return res.status(404).json({ error: "Teacher not found" });
     }
 
+    // Get the Subject model
+    const Subject = require("../models/subjectSchema.js");
+
     // multiple subject assignment
     const subjectsToAdd = Array.isArray(subjects) ? subjects : [subjects];
 
+    // Update teacher's subjects array
     subjectsToAdd.forEach((sub) => {
       if (!teacher.subjects.includes(sub)) {
         teacher.subjects.push(sub);
       }
     });
+
+    // Update the teacher field in Subject model
+    await Subject.updateMany(
+      { _id: { $in: subjectsToAdd } },
+      { teacher: teacherId }
+    );
 
     await teacher.save();
     const updatedTeacher = await Teacher.findById(teacherId)
@@ -316,12 +326,120 @@ exports.removeTeacherSubject = async (req, res) => {
     teacher.subjects = teacher.subjects.filter(id => id.toString() !== subjectId);
     await teacher.save();
 
+    // Get the Subject model and remove teacher reference
+    const Subject = require("../models/subjectSchema.js");
+    await Subject.findByIdAndUpdate(subjectId, { $unset: { teacher: "" } });
+
     const updatedTeacher = await Teacher.findById(teacherId)
       .populate('classesAssigned', 'sclassName')
       .populate('subjects', 'subName subCode');
 
     res.status(200).json({ message: "Subject removed.", teacher: updatedTeacher });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get teacher's class-subject assignments
+exports.getTeacherClassSubjects = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    if (!teacherId) {
+      return res.status(400).json({ error: "Teacher ID is required" });
+    }
+
+    const teacher = await Teacher.findById(teacherId)
+      .populate("classesAssigned", "sclassName")
+      .populate("subjects", "subName subCode");
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Get the Subject model
+    const Subject = require("../models/subjectSchema.js");
+
+    // Sync existing assignments if needed
+    if (teacher.subjects.length > 0) {
+      await Subject.updateMany(
+        { _id: { $in: teacher.subjects.map(sub => sub._id) } },
+        { teacher: teacherId }
+      );
+    }
+
+    // Find subjects assigned to this teacher
+    const assignedSubjects = await Subject.find({ teacher: teacherId })
+      .populate("sclassName", "sclassName")
+      .populate("teacher", "name");
+
+    // Group subjects by class
+    const classSubjectMap = {};
+
+    assignedSubjects.forEach(subject => {
+      const className = subject.sclassName.sclassName;
+      if (!classSubjectMap[className]) {
+        classSubjectMap[className] = [];
+      }
+      classSubjectMap[className].push({
+        _id: subject._id,
+        subName: subject.subName,
+        subCode: subject.subCode
+      });
+    });
+
+    // Create response with class-subject assignments
+    const classAssignments = teacher.classesAssigned.map(cls => ({
+      class: {
+        _id: cls._id,
+        sclassName: cls.sclassName
+      },
+      subjects: classSubjectMap[cls.sclassName] || []
+    }));
+
+    res.status(200).json({
+      teacher: {
+        _id: teacher._id,
+        name: teacher.fullName,
+        email: teacher.email
+      },
+      classAssignments,
+      allSubjects: teacher.subjects
+    });
+  } catch (err) {
+    console.error("Get Teacher Class Subjects Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Sync all teacher-subject assignments (for fixing existing data)
+exports.syncTeacherSubjectAssignments = async (req, res) => {
+  try {
+    const Subject = require("../models/subjectSchema.js");
+
+    // Get all teachers with their subjects
+    const teachers = await Teacher.find().populate("subjects");
+
+    let updatedCount = 0;
+
+    for (const teacher of teachers) {
+      if (teacher.subjects.length > 0) {
+        // Update subjects to point to this teacher
+        const result = await Subject.updateMany(
+          { _id: { $in: teacher.subjects.map(sub => sub._id) } },
+          { teacher: teacher._id }
+        );
+        updatedCount += result.modifiedCount;
+      }
+    }
+
+    res.status(200).json({
+      message: `Synced ${updatedCount} subject assignments for ${teachers.length} teachers`,
+      updatedCount,
+      teacherCount: teachers.length
+    });
+  } catch (err) {
+    console.error("Sync Teacher Subject Assignments Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
