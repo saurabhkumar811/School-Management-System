@@ -25,7 +25,7 @@ const TeacherClasses = () => {
   const classColumns = [
     { id: "name", label: "Class Name", minWidth: 170 },
     { id: "section", label: "Section", minWidth: 100 },
-    { id: "subjects", label: "Subjects Taught", minWidth: 200 },
+    { id: "subjects", label: "Subjects Assigned", minWidth: 200 },
   ];
 
   const classRows = classesAssigned.map((cls) => {
@@ -83,7 +83,7 @@ const TeacherClasses = () => {
               Classes Assigned: <strong>{classesAssigned.length}</strong>
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Subjects Qualified: <strong>{subjectsAssigned.length}</strong>
+              Subjects Assigned: <strong>{subjectsAssigned.length}</strong>
             </Typography>
           </Grid>
         </Grid>
