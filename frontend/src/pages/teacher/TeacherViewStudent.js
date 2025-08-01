@@ -47,7 +47,7 @@ const TeacherViewStudent = () => {
             setSclassName(userDetails.sclassName || '');
             setStudentSchool(userDetails.school || '');
             setSubjectMarks(userDetails.examResult || '');
-            setSubjectAttendance(userDetails.attendance || []);
+            setSubjectAttendance(userDetails.monthlyAttendance || []);
         }
     }, [userDetails]);
 
@@ -68,13 +68,9 @@ const TeacherViewStudent = () => {
                 </>
                 :
                 <div>
-                    Name: {userDetails.name}
+                    Name: {userDetails.fullName}
                     <br />
-                    Roll Number: {userDetails.rollNum}
-                    <br />
-                    Class: {sclassName.sclassName}
-                    <br />
-                    School: {studentSchool.schoolName}
+                    Roll Number: {userDetails.roll}
                     <br /><br />
 
                     <h3>Attendance:</h3>

@@ -1,136 +1,187 @@
 import React, { useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  Avatar,
+  Grid,
+  Divider,
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { getTeacherDetail } from '../../redux/teacherRelated/teacherHandle';
 
-function TeacherDetails({ teacherId }) {
+const TeacherDetails = () => {
   const dispatch = useDispatch();
-  const teacher = useSelector(state => state.teacher.teacherDetail);
+  const { id } = useParams(); // use this id for fetching
+  const { teacherDetails: d, loading } = useSelector((state) => state.teacher);
+  const BASE_URL = "http://localhost:5001/";
 
   useEffect(() => {
-    dispatch(getTeacherDetail(teacherId));
-  }, [dispatch, teacherId]);
+    if (id) dispatch(getTeacherDetail(id));
+  }, [dispatch, id]);
 
-  if (!teacher) return <div>Loading...</div>;
+  if (loading || !d) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        <Typography>Loading teacher details...</Typography>
+      </Box>
+    );
+  }
+
+  const teacherImage = typeof d.photo === 'string' ? BASE_URL + d.photo : d.photo?.url || '';
+
+  const renderFile = (file) =>
+    file && typeof file === 'string' ? (
+      <a href={BASE_URL + file} target="_blank" rel="noopener noreferrer">
+        {file.split('/').pop()}
+      </a>
+    ) : file?.name ? (
+      <span>{file.name}</span>
+    ) : (
+      <span>-</span>
+    );
+
+  const renderFileList = (arr) =>
+    Array.isArray(arr) && arr.length > 0 ? (
+      arr.map((f, i) => (
+        <div key={i}>
+          {typeof f === 'string' ? (
+            <a href={BASE_URL + f} target="_blank" rel="noopener noreferrer">
+              {f.split('/').pop()}
+            </a>
+          ) : f?.name ? (
+            <span>{f.name}</span>
+          ) : (
+            <span>-</span>
+          )}
+        </div>
+      ))
+    ) : (
+      <span>-</span>
+    );
 
   return (
-    <div className="teacher-details">
-      <img src={`/${teacher.photo}`} alt="Teacher" style={{ width: 120, borderRadius: '50%' }} />
-      <h2>{teacher.fullName}</h2>
-      <p><b>Employee Code:</b> {teacher.employeeCode}</p>
-      <p><b>Date of Birth:</b> {teacher.dob && new Date(teacher.dob).toLocaleDateString()}</p>
-      <p><b>Gender:</b> {teacher.gender}</p>
-      <p><b>Contact Number:</b> {teacher.contactNumber}</p>
-      <p><b>Email:</b> {teacher.email}</p>
-      <p><b>Address:</b> {teacher.address}</p>
-      <p><b>Emergency Contact:</b> {teacher.emergencyContact && `${teacher.emergencyContact.name} (${teacher.emergencyContact.relation}) - ${teacher.emergencyContact.phone}`}</p>
-      <p><b>Designation:</b> {teacher.designation}</p>
-      <p><b>Department:</b> {teacher.department}</p>
-      <p><b>Subjects:</b> {teacher.subjects && teacher.subjects.map(s => s.name).join(', ')}</p>
-      <p><b>Classes Assigned:</b> {teacher.classesAssigned && teacher.classesAssigned.map(c => c.name).join(', ')}</p>
-      <p><b>Date of Joining:</b> {teacher.dateOfJoining && new Date(teacher.dateOfJoining).toLocaleDateString()}</p>
-      <p><b>Employment Type:</b> {teacher.employmentType}</p>
-      <p><b>Reporting Authority:</b> {teacher.reportingAuthority}</p>
-      <p><b>Qualification:</b> {teacher.qualification}</p>
-      <p><b>Experience (years):</b> {teacher.experienceYears}</p>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+      <Paper elevation={4} sx={{ maxWidth: 800, width: '100%', borderRadius: 2, p: 3 }}>
+        {/* Avatar + Name */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2, mb: 2 }}>
+          <Avatar src={teacherImage} alt={d.fullName} sx={{ width: 100, height: 100, fontSize: 42 }}>
+            {d.fullName && d.fullName[0]}
+          </Avatar>
+          <Typography variant="h5" fontWeight="bold">{d.fullName}</Typography>
+          <Typography variant="caption" color="textSecondary">
+            Employee Code: {d.employeeCode || '-'}
+          </Typography>
+        </Box>
 
-      <h3>CTC & Payroll Details</h3>
-      <p><b>Annual CTC:</b> ₹{teacher.annualCTC}</p>
-      <p><b>Monthly Gross:</b> ₹{teacher.monthlyGross}</p>
-      <h4>Salary Breakup</h4>
-      <ul>
-        <li>Basic: {teacher.salaryBreakup && teacher.salaryBreakup.basic}</li>
-        <li>HRA: {teacher.salaryBreakup && teacher.salaryBreakup.hra}</li>
-        <li>DA: {teacher.salaryBreakup && teacher.salaryBreakup.da}</li>
-        <li>Special Allowance: {teacher.salaryBreakup && teacher.salaryBreakup.specialAllowance}</li>
-        <li>Transport Allowance: {teacher.salaryBreakup && teacher.salaryBreakup.transportAllowance}</li>
-        <li>Medical Allowance: {teacher.salaryBreakup && teacher.salaryBreakup.medicalAllowance}</li>
-        <li>PF: {teacher.salaryBreakup && teacher.salaryBreakup.pf}</li>
-        <li>PT: {teacher.salaryBreakup && teacher.salaryBreakup.pt}</li>
-        <li>TDS: {teacher.salaryBreakup && teacher.salaryBreakup.tds}</li>
-        <li>Other Deductions: {teacher.salaryBreakup && teacher.salaryBreakup.otherDeductions}</li>
-        <li>Net Salary: {teacher.salaryBreakup && teacher.salaryBreakup.netSalary}</li>
-      </ul>
-      <p><b>Payment Cycle:</b> {teacher.paymentCycle}</p>
-      <p><b>Payment Mode:</b> {teacher.paymentMode}</p>
-      <p><b>Bank Account Number:</b> {teacher.bankAccountNumber}</p>
-      <p><b>Bank Name:</b> {teacher.bankName}</p>
-      <p><b>IFSC Code:</b> {teacher.ifscCode}</p>
-      <p><b>PAN Number:</b> {teacher.panNumber}</p>
-      <p><b>Aadhar Number:</b> {teacher.aadharNumber}</p>
+        {/* Personal & Contact */}
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Personal Details</Typography>
+            <Typography>DOB: {d.dob ? new Date(d.dob).toLocaleDateString() : '-'}</Typography>
+            <Typography>Gender: {d.gender || '-'}</Typography>
+            <Typography>Qualification: {d.qualification || '-'}</Typography>
+            <Typography>Experience: {d.experienceYears || '-'} years</Typography>
+            <Typography>Working Days/Month: {d.workingDaysPerMonth || '-'}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Contact Details</Typography>
+            <Typography>Mobile: {d.contactNumber || '-'}</Typography>
+            <Typography>Email: {d.email || '-'}</Typography>
+            <Typography>Address: {d.address || '-'}</Typography>
+            <Typography>Username: {d.username || '-'}</Typography>
+          </Grid>
+        </Grid>
 
-      <h3>Attendance & Leave</h3>
-      <p><b>Working Days/Month:</b> {teacher.workingDaysPerMonth}</p>
-      <p><b>Leave Balance:</b> CL: {teacher.leaveBalance && teacher.leaveBalance.cl}, SL: {teacher.leaveBalance && teacher.leaveBalance.sl}, PL: {teacher.leaveBalance && teacher.leaveBalance.pl}</p>
-      <h4>Attendance Record</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {teacher.attendanceRecord && teacher.attendanceRecord.map((att, idx) => (
-            <tr key={idx}>
-              <td>{att.date && new Date(att.date).toLocaleDateString()}</td>
-              <td>{att.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <Divider sx={{ my: 2 }} />
 
-      <h3>Performance & Appraisal</h3>
-      <p><b>Performance Score:</b> {teacher.performanceScore}</p>
-      <p><b>Last Increment Date:</b> {teacher.lastIncrementDate && new Date(teacher.lastIncrementDate).toLocaleDateString()}</p>
-      <p><b>Last Increment Amount:</b> {teacher.lastIncrementAmount}</p>
-      <h4>Appraisal History</h4>
-      <ul>
-        {teacher.appraisalHistory && teacher.appraisalHistory.map((app, idx) => (
-          <li key={idx}>
-            {app.date && new Date(app.date).toLocaleDateString()} - Score: {app.score}, Increment: {app.incrementAmount}, Remarks: {app.remarks}
-          </li>
-        ))}
-      </ul>
+        {/* Emergency Contact */}
+        <Box sx={{ mb: 2 }}>
+          <Typography fontWeight="bold">Emergency Contact</Typography>
+          <Typography>Name: {d.emergencyContact?.name || '-'}</Typography>
+          <Typography>Relation: {d.emergencyContact?.relation || '-'}</Typography>
+          <Typography>Phone: {d.emergencyContact?.phone || '-'}</Typography>
+        </Box>
 
-      <h3>Documents</h3>
-      <ul>
-        <li>Resume: {teacher.documents.resume && <a href={`/${teacher.documents.resume}`} target="_blank" rel="noreferrer">View</a>}</li>
-        <li>Qualification Certificates: {teacher.documents.qualificationCertificates && teacher.documents.qualificationCertificates.map((cert, idx) => (
-          <span key={idx}><a href={`/${cert}`} target="_blank" rel="noreferrer">View</a>{idx < teacher.documents.qualificationCertificates.length - 1 ? ', ' : ''}</span>
-        ))}</li>
-        <li>ID Proof: {teacher.documents.idProof && <a href={`/${teacher.documents.idProof}`} target="_blank" rel="noreferrer">View</a>}</li>
-        <li>Experience Letters: {teacher.documents.experienceLetters && teacher.documents.experienceLetters.map((exp, idx) => (
-          <span key={idx}><a href={`/${exp}`} target="_blank" rel="noreferrer">View</a>{idx < teacher.documents.experienceLetters.length - 1 ? ', ' : ''}</span>
-        ))}</li>
-        <li>Joining Letter: {teacher.documents.joiningLetter && <a href={`/${teacher.documents.joiningLetter}`} target="_blank" rel="noreferrer">View</a>}</li>
-      </ul>
+        {/* Employment & Bank */}
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Employment Info</Typography>
+            <Typography>Type: {d.employmentType || '-'}</Typography>
+            <Typography>Payment Cycle: {d.paymentCycle || '-'}</Typography>
+            <Typography>CTC (Annual): ₹{d.annualCTC || '-'}</Typography>
+            <Typography>Gross (Monthly): ₹{d.monthlyGross || '-'}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography fontWeight="bold">Bank Details</Typography>
+            <Typography>Bank Name: {d.bankName || '-'}</Typography>
+            <Typography>Account #: {d.bankAccountNumber || '-'}</Typography>
+            <Typography>IFSC: {d.ifscCode || '-'}</Typography>
+            <Typography>PAN: {d.panNumber || '-'}</Typography>
+            <Typography>Aadhar: {d.aadharNumber || '-'}</Typography>
+          </Grid>
+        </Grid>
 
-      <h3>Timetable</h3>
-      <ul>
-        {teacher.timetable && teacher.timetable.map((tt, idx) => (
-          <li key={idx}>{tt.day}: {tt.periods.join(', ')}</li>
-        ))}
-      </ul>
+        {/* Salary & Leave */}
+        {(d.salaryBreakup || d.leaveBalance) && (
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            {d.salaryBreakup && (
+              <Grid item xs={12} sm={6}>
+                <Typography fontWeight="bold">Salary Breakup</Typography>
+                {Object.entries(d.salaryBreakup).map(([key, value]) => (
+                  <Typography key={key}>{key}: ₹{value || '-'}</Typography>
+                ))}
+              </Grid>
+            )}
+            {d.leaveBalance && (
+              <Grid item xs={12} sm={6}>
+                <Typography fontWeight="bold">Leave Balance</Typography>
+                {Object.entries(d.leaveBalance).map(([key, value]) => (
+                  <Typography key={key}>{key.toUpperCase()}: {value || '-'}</Typography>
+                ))}
+              </Grid>
+            )}
+          </Grid>
+        )}
 
-      <h3>Feedback</h3>
-      <ul>
-        {teacher.feedback && teacher.feedback.map((fb, idx) => (
-          <li key={idx}>{fb.class}: {fb.rating} stars - {fb.remarks}</li>
-        ))}
-      </ul>
-
-      <h3>Remarks on Students</h3>
-      <ul>
-        {teacher.remarksOnStudents && teacher.remarksOnStudents.map((rem, idx) => (
-          <li key={idx}>{rem.student && rem.student.fullName}: {rem.remark}</li>
-        ))}
-      </ul>
-
-      <h3>Login & Digital Signature</h3>
-      <p><b>Username:</b> {teacher.username}</p>
-      <p><b>Digital Signature:</b> {teacher.digitalSignature && <a href={`/${teacher.digitalSignature}`} target="_blank" rel="noreferrer">View</a>}</p>
-    </div>
+        {/* Teaching Assignment */}
+        <Box sx={{ mb: 2 }}>
+          <Typography fontWeight="bold" mb={1}>Teaching Assignment</Typography>
+          <Typography fontWeight="medium">Assigned Classes:</Typography>
+          {d.classesAssigned && d.classesAssigned.length > 0 ? (
+            d.classesAssigned.map((cls) => (
+              <Box key={cls._id} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
+                <Typography>{cls.sclassName || cls.name || '-'}</Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">No class assigned.</Typography>
+          )}
+          <Typography fontWeight="medium" mt={2}>Assigned Subjects:</Typography>
+          {d.subjects && d.subjects.length > 0 ? (
+            d.subjects.map((sub) => (
+              <Box key={sub._id} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
+                <Typography>{sub.subName || sub.name || '-'}</Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">No subject assigned.</Typography>
+          )}
+        </Box>
+        {/* Documents */}
+        <Box>
+          <Typography fontWeight="bold" sx={{ mb: 1 }}>Documents</Typography>
+          <Typography>Resume: {renderFile(d.documents?.resume)}</Typography>
+          <Typography>ID Proof: {renderFile(d.documents?.idProof)}</Typography>
+          <Typography>Joining Letter: {renderFile(d.documents?.joiningLetter)}</Typography>
+          <Typography>Digital Signature: {renderFile(d.digitalSignature)}</Typography>
+          <Typography>Qualification Certificates: {renderFileList(d.documents?.qualificationCertificates)}</Typography>
+          <Typography>Experience Letters: {renderFileList(d.documents?.experienceLetters)}</Typography>
+        </Box>
+      </Paper>
+    </Box>
   );
-}
+};
 
 export default TeacherDetails;

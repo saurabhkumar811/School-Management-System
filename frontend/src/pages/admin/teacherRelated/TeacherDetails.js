@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTeacherDetail, removeTeacherClass, removeTeacherSubject } from '../../../redux/teacherRelated/teacherHandle';
 
+
 const TeacherDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

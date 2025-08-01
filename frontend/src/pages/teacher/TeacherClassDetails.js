@@ -14,6 +14,7 @@ const TeacherClassDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { sclassStudents, loading, error, getresponse } = useSelector((state) => state.sclass);
+  // console.log("Redux sclassStudents data:", sclassStudents);
   const { teacherDetails } = useSelector((state) => state.teacher);
 
   const { currentUser } = useSelector((state) => state.user);
@@ -41,8 +42,8 @@ const TeacherClassDetails = () => {
   ];
 
   const studentRows = sclassStudents.map((student) => ({
-    name: student.name,
-    rollNum: student.rollNum,
+    name: student.fullName,
+    rollNum: student.roll,
     id: student._id,
   }));
 

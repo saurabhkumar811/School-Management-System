@@ -49,8 +49,8 @@ const ViewSubject = () => {
 
   const studentRows = sclassStudents.map((student) => {
     return {
-      rollNum: student.rollNum,
-      name: student.name,
+      rollNum: student.roll,
+      name: student.fullName,
       id: student._id,
     };
   })
